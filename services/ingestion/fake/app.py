@@ -5,8 +5,6 @@ no network, no randomness. Request counters let tests prove caching and
 coalescing (upstream hits stay at 1 for repeated/identical requests).
 """
 
-from typing import cast
-
 from fastapi import FastAPI, HTTPException, Request
 
 from common.contracts import (
@@ -86,7 +84,7 @@ def create_app() -> FastAPI:
             if query and query not in haystack:
                 continue
             offered: list[ArtifactType] = [
-                cast(ArtifactType, t) for t in ("lyrics", "chord_chart") if t in wanted
+                t for t in ("lyrics", "chord_chart") if t in wanted
             ]
             if not offered:
                 continue
