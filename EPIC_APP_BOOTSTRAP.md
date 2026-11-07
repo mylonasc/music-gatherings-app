@@ -1,6 +1,6 @@
 # Epic: Bootstrap the Music Gatherings App
 
-Status: S01–S11 implemented on `main`. S12–S16 remain plans.
+Status: S01–S12 implemented on `main`. S13–S16 remain plans.
 
 ## 1. Purpose and scope
 
