@@ -1,6 +1,7 @@
 # Epic: Mobile-first UI replacement
 
-Status: planned; implementation branch `implementation/ui-improvements`.
+Status: implemented on `implementation/ui-improvements`; final CI/PR evidence is
+recorded below. Not a claim that unrelated backend release risks are resolved.
 This filename intentionally retains the requested spelling. Issue links and
 slice evidence are maintained below. A slice is not complete merely because
 its code exists: its acceptance tests and review evidence must be recorded.
@@ -217,6 +218,45 @@ and run before being called verified. CI success is evidence only for its exact 
 
 Issue links, per-slice status, evidence, and any optional `techdebt-ui-epic` follow-ups
 will be maintained as implementation proceeds.
+
+## Implementation evidence
+
+- UI-01: route/state inventory above; historical desktop/phone captures in
+  `docs/ui-baseline/`, captured before replacement against isolated fixtures.
+- UI-02/UI-03: design tokens, semantic primitives, studio shell with one primary
+  navigation, active track ancestry, compact phone header, safe-area insets;
+  short landscape navigation flows with the page to avoid hiding focused fields.
+- UI-04: render-time resource identity check, abort/late-response protection,
+  query-disable and denial tests for JSON/text; job state keyed to job identity.
+- UI-05: isolated track cards/votes and filter module; collapsible secondary
+  filters keep the phone list approachable. Local search remains distinct.
+- UI-06: reading contexts and version selection, inventory, material attachment,
+  and typed viewer dispatch are separate modules. Plain/LRC remain distinct;
+  music HTML is strictly sanitized with pinned DOMPurify. Unsupported sheet/tab
+  formats have download/reference fallbacks, not invented preview support.
+- UI-07/UI-08: dedicated method-entry page, draft-preserving manual/material forms,
+  multipart CSRF client, independent result/import controllers, scoped idempotency
+  keys, authorized `/api/v1/providers` capability endpoint. Built-in provider
+  names/default URLs are registered once in `backend/app/core/providers.py`.
+- UI-09: branded auth layout, crew selection and member cards, keyboard-operated
+  admin tabs/panels; existing approval/profile/test/audit operations preserved.
+- UI-10/UI-11: six browser projects; named success/failure checkpoint attachments,
+  standalone HTML gallery, retained failure traces, 12 curated visual baselines,
+  320px/landscape/200% text, accessibility/overflow assertions, and PR check-summary
+  artifact links. All run in a digest-pinned Playwright 1.57.0 Noble image.
+- UI-12: one production shell/styles path, feature extension guide in
+  `frontend/README.md`, safe disposable-stack runner and agent guidance updated.
+
+Local validation: **187 Playwright tests passed** in a fresh isolated run without
+baseline updates; **31 frontend tests**, **95 backend tests**, frontend production
+build/typecheck, backend Ruff and mypy passed. Screenshot generation was a separate
+explicit review run, followed by normal comparison. Screenshots for all six
+projects were visually inspected. CI must still be checked for its exact SHA.
+
+Optional maintainability follow-ups: #40 (`techdebt-ui-epic`), linked to parent
+#27. Remaining backend security/durability/recovery issues are not automatically
+closed by these UI changes; in particular #21 also covers backend trust/serving
+boundaries, beyond this frontend sanitation.
 
 ## Issue index
 

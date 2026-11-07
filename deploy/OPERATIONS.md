@@ -85,7 +85,8 @@ stopped-stack tarball plus the SQLite files is a coherent snapshot. The CI
   services. Effective limits are observable via admin panels and `/v1/stats`.
 - Uploaded bytes are never executed: rendered service HTML is escaped at
   render time; artifact downloads are `attachment` + `nosniff`; the UI only
-  renders HTML produced by our own processor.
+  sanitizes inline music HTML with an inert tag/attribute allowlist, including
+  processor output. Plain lyrics and LRC remain inert text.
 - Passwords are Argon2id hashes; sessions are HttpOnly + SameSite cookies
   with CSRF double-submit on mutations; agent credentials are hashed
   bearer tokens scoped to one crew with audited, read-only tools.

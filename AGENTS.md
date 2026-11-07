@@ -61,6 +61,16 @@ unless the task authorizes it. Preserve unrelated user changes.
   Work on `implementation/ui-improvements`; reference owning issues in commits.
   Shared visual tokens live in `frontend/src/styles/tokens.css`; use semantic
   primitives through `components/ui` and avoid broad descendant section styling.
+- UI boundaries and extension recipes: `frontend/README.md`. Track viewers are
+  dispatched through a typed registry; sanitize music HTML with `lib/music-html`
+  even for processor output. Keep adding methods, attachment forms, provider
+  discovery, result cards, and import controllers independent. Backend built-in
+  provider registration lives in `backend/app/core/providers.py`.
+- Full isolated UI matrix: `bash tests/e2e/run-isolated.sh` from root (Docker,
+  Node 24). Creates/cleans only its unique test project, never normal app volumes.
+  Six desktop/Pixel/iPhone projects use digest-pinned Playwright containers;
+  successful screenshots are in `tests/e2e/review-gallery/index.html`. Baseline
+  updates are explicit review operations, never automatic CI fixes. See E2E README.
 
 - React/TypeScript, feature-oriented modules, reusable accessible primitives,
   generated API types, and consistent server-state handling.

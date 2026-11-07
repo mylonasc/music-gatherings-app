@@ -1,5 +1,20 @@
 # Music Gatherings App
 
+## Mobile UI
+
+The studio UI replaces the original interface, with phone bottom navigation,
+desktop sidebar, an extensible music-reading workspace, and separate suggestion,
+material-attachment, discovery and import modules. See
+[`EPIC_UI_IMRPOVEMENTS.md`](EPIC_UI_IMRPOVEMENTS.md) (#27) and
+[`frontend/README.md`](frontend/README.md) for architecture and extension recipes.
+
+Visual review: `bash tests/e2e/run-isolated.sh` creates only a disposable test
+stack and runs six desktop/Pixel/iPhone browser projects. Open
+`tests/e2e/review-gallery/index.html` afterwards. CI publishes this gallery and
+Playwright reports on successful runs too, linked from PR checks (14-day
+retention). See [`tests/e2e/README.md`](tests/e2e/README.md). Emulation does not
+certify physical-device or virtual-keyboard behavior.
+
 S01 foundation: FastAPI backend skeleton + mobile-first React frontend skeleton,
 private Compose network, and named `app-data` volume. See `EPIC_APP_BOOTSTRAP.md`
 for the full plan (slices S01–S16) and `AGENTS.md` for contributor rules.
