@@ -4,8 +4,8 @@ import { ErrorNotice, Loading } from "../../../components/ui";
 import type { ArtifactOut } from "../../../lib/api-types";
 import { useText } from "../../../lib/use-api";
 
-type ViewerProps = { artifact: ArtifactOut };
-type ViewerDefinition = { id: string; supports: (artifact: ArtifactOut) => boolean; component: ComponentType<ViewerProps> };
+export type ViewerProps = { artifact: ArtifactOut };
+export type ViewerDefinition = { id: string; supports: (artifact: ArtifactOut) => boolean; component: ComponentType<ViewerProps> };
 
 function TextViewer({ artifact }: ViewerProps) {
   const { data, error, loading, reload } = useText(`/api/v1/artifacts/${artifact.id}/content`);

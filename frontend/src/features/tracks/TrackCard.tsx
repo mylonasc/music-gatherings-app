@@ -20,7 +20,7 @@ export function TrackCard({ item, crewId }: { item: CrewTrackListItem; crewId: s
       {item.requester && <><dt>Suggested by</dt><dd>{item.requester}</dd></>}
       {item.genres.length > 0 && <><dt>Genres</dt><dd>{item.genres.join(", ")}</dd></>}
     </dl>
-    <div className="material-badges" aria-label="Available materials">
+    <div className="material-badges" role="group" aria-label="Available materials">
       {item.artifact_kinds.map((kind) => <Badge key={kind}>{kind.replaceAll("_", " ")}</Badge>)}
       {item.piano_suitability === "suggested" && <Badge>piano-friendly</Badge>}
     </div>

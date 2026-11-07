@@ -1,150 +1,31 @@
 import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
-import { ErrorNotice, Loading, Page } from "../../components/ui";
+import { Badge, ErrorNotice, Loading, Page } from "../../components/ui";
 import { useGet } from "../../lib/use-api";
-import { DocumentViewer } from "./viewers/DocumentViewer";
+import type { TrackDetail } from "../../lib/api-types";
 import { MaterialForm } from "../adding/MaterialForm";
-import type { ArtifactOut, RepresentationResponse, TrackDetail, VersionDetailOut } from "../../lib/api-types";
-
-function artifactLabel(kind: string): string {
-  return kind.replaceAll("_", " ");
-}
-
-type ViewContext = "audience" | "guitar" | "piano";
+import { Representations } from "./Representations";
+import { TrackVersions } from "./TrackVersions";
+import "./tracks.css";
 
 export function TrackDetailPage() {
   const { trackId } = useParams<{ trackId: string }>();
-  const { data, error, loading, reload } = useGet<TrackDetail>(
-    trackId ? `/api/v1/tracks/${trackId}` : null,
-  );
-
+  const { data, error, loading, reload } = useGet<TrackDetail>(trackId ? `/api/v1/tracks/${trackId}` : null);
   if (loading) return <Loading label="Loading track…" />;
-  if (error || !data)
-    return (
-      <Page title="Track">
-        <ErrorNotice message={error ?? "Track not found."} onRetry={reload} />
-        <p>
-          <Link to="/">Back to jam tracks</Link>
-        </p>
-      </Page>
-    );
-
+  if (error || !data) return <Page title="Track"><ErrorNotice message={error ?? "Track not found."} onRetry={reload} /><p><Link to="/">Back to jam tracks</Link></p></Page>;
   const title = data.title ?? data.artist ?? "Untitled track";
-  const subtitle = data.title && data.artist ? `${data.title} — ${data.artist}` : null;
-  const musicalKeys = Array.from(
-    new Set(data.versions.map((v) => v.musical_key).filter((k): k is string => Boolean(k))),
-  );
-
-  return (
-    <Page title={title}>
-      <p>
-        <Link to="/">← Jam tracks</Link>
-      </p>
-      {subtitle && <p>{subtitle}</p>}
-      {data.description && <p>{data.description}</p>}
-      {data.genres.length > 0 && <p>Genres: {data.genres.join(", ")}</p>}
-      {musicalKeys.length > 0 && <p>Keys: {musicalKeys.join(", ")}</p>}
-      {data.crew_entries.map((entry) => (
-        <section key={entry.crew_track_id} aria-label={`${entry.crew_name} entry`}>
-          <h3>
-            {entry.crew_name} · votes {entry.vote_score}
-          </h3>
-          {entry.requester && <p>Suggested by {entry.requester}</p>}
-          {entry.notes && <p>{entry.notes}</p>}
-        </section>
-      ))}
-      <h3>Versions and materials</h3>
-      <MaterialForm key={data.id} trackId={data.id} versions={data.versions} onSaved={reload} />
-      {data.versions.length === 0 && <p role="status">No versions yet.</p>}
-      {trackId && <Representations key={trackId} trackId={trackId} />}
-      {data.versions.map((version: VersionDetailOut) => (
-        <section key={version.id} aria-label={version.label ?? "Version"}>
-          <h4>{version.label ?? "Version"}</h4>
-          {version.musical_key && <p>Key: {version.musical_key}</p>}
-          {version.notes && <p>{version.notes}</p>}
-          {(version.artifacts ?? []).length === 0 && <p>No materials attached yet.</p>}
-          <ul>
-            {(version.artifacts ?? []).map((artifact: ArtifactOut) => (
-              <li key={artifact.id}>
-                {artifactLabel(artifact.kind)} ({artifact.mime_type})
-                {artifact.is_external && artifact.external_url ? (
-                  <>
-                    {" — "}
-                    <a href={artifact.external_url} target="_blank" rel="noreferrer">
-                      open external reference
-                    </a>
-                  </>
-                ) : (
-                  <>
-                    {" — "}
-                    <a href={`/api/v1/artifacts/${artifact.id}/content`}>
-                      download{artifact.file_name ? ` ${artifact.file_name}` : ""}
-                    </a>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-    </Page>
-  );
-}
-
-function Representations({ trackId }: { trackId: string }) {
-  const [context, setContext] = useState<ViewContext>("audience");
-  const { data, error, loading } = useGet<RepresentationResponse>(
-    `/api/v1/tracks/${trackId}/representations?context=${context}`,
-  );
-
-  return (
-    <section aria-label="Representations">
-      <h3>Views</h3>
-      <div role="group" aria-label="Choose your view">
-        {(["audience", "guitar", "piano"] as const).map((option) => (
-          <label key={option} htmlFor={`context-${option}`}>
-            <input
-              id={`context-${option}`}
-              type="radio"
-              name="view-context"
-              value={option}
-              checked={context === option}
-              onChange={() => setContext(option)}
-            />{" "}
-            {option}
-          </label>
-        ))}
-      </div>
-      {loading && <Loading label="Loading view…" />}
-      {error && <ErrorNotice message={error} />}
-      {data && (data.items ?? []).length === 0 && (
-        <p role="status">Nothing available for the {context} view yet.</p>
-      )}
-      {data && (
-        <ul className="track-list">
-          {(data.items ?? []).map((item) => (
-            <li key={item.artifact.id} className="track-card">
-              <strong>{artifactLabel(item.artifact.kind)}</strong>{" "}
-              <small>
-                ({item.artifact.mime_type}
-                {item.derived ? ", derived" : ", original"}
-                {item.source_provider ? ` via ${item.source_provider}` : ""})
-              </small>
-              {item.attribution && (
-                <p>
-                  <small>{item.attribution}</small>
-                </p>
-              )}
-              {(item.warnings ?? []).map((warning, index) => (
-                <p key={index} role="note">
-                  <small>Note: {warning}</small>
-                </p>
-              ))}
-              <DocumentViewer artifact={item.artifact} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
+  return <Page title={title}>
+    <p><Link to="/">← Jam tracks</Link></p>
+    {data.title && data.artist && <p className="track-artist">{data.title} — {data.artist}</p>}
+    {data.description && <p>{data.description}</p>}
+    <div className="material-badges">{data.genres.map((genre) => <Badge key={genre}>{genre}</Badge>)}</div>
+    <div className="crew-entries">{data.crew_entries.map((entry) => <section key={entry.crew_track_id} aria-label={`${entry.crew_name} entry`}>
+      <h3>{entry.crew_name} · votes {entry.vote_score}</h3>
+      {entry.requester && <p>Suggested by {entry.requester}</p>}{entry.notes && <p>{entry.notes}</p>}
+    </section>)}</div>
+    {trackId && <Representations key={trackId} trackId={trackId} versions={data.versions} />}
+    <h3>Versions and materials</h3>
+    <MaterialForm key={data.id} trackId={data.id} versions={data.versions} onSaved={reload} />
+    {!data.versions.length && <p role="status">No versions yet.</p>}
+    <TrackVersions versions={data.versions} />
+  </Page>;
 }

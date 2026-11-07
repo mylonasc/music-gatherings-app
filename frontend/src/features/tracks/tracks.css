@@ -10,4 +10,18 @@
 .votes { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: .9rem; }
 .votes > span:first-child { margin-right: auto; font-size: .85rem; font-weight: 650; }
 .votes button { padding: .4rem .65rem; min-width: 44px; }
+.track-artist { color: var(--muted); font-size: 1.1rem; }
+.crew-entries { display: flex; gap: 1rem; flex-wrap: wrap; margin-block: 1rem; }
+.crew-entries section { padding: .75rem 1rem; border-left: 3px solid var(--line); }
+.crew-entries h3 { font-size: .95rem; margin: 0; }
+.crew-entries p { font-size: .85rem; color: var(--muted); margin: .3rem 0; }
+.reading-workspace { margin-block: 2rem; }
+.workspace-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.workspace-heading h3 { margin: .3rem 0 1rem; }
+.workspace-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
+.material-provenance, .version-facts { color: var(--muted); margin: .4rem 0; }
+.material-inventory { padding-left: 1rem; }
+.material-inventory li { margin-block: .65rem; }
+.material-inventory a { display: inline-flex; min-height: 44px; align-items: center; }
+.version-inventory h4 { margin-block: 0 .5rem; font-size: 1.05rem; }
 @media (min-width: 75rem) { .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
