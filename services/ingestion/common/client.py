@@ -90,6 +90,10 @@ class LimitedHttpClient:
 
     def _classify(self, response: httpx.Response) -> ProviderError | None:
         status = response.status_code
+        if 300 <= status < 400:
+            # Redirects are never followed (SSRF safety); a redirect here
+            # means the upstream changed behavior and must be investigated.
+            return InvalidResponseError(f"unexpected redirect: {status}")
         if status < 400:
             return None
         if status == 429:

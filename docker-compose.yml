@@ -57,6 +57,28 @@ services:
     # No published ports: deterministic fixture provider for tests/admin panels.
     # Worker/CLI reach it as http://ingestion-fake:8001.
 
+  ingestion-genius:
+    build:
+      context: ./services/ingestion
+      dockerfile: genius/Dockerfile
+    image: music-gatherings-ingestion-genius:local
+    environment:
+      GENIUS_ACCESS_TOKEN: ${GENIUS_ACCESS_TOKEN:-}
+    networks:
+      - app-net
+    restart: unless-stopped
+    # No published ports: official Genius API metadata only (reference-only).
+
+  ingestion-ultimate-guitar:
+    build:
+      context: ./services/ingestion
+      dockerfile: ultimateguitar/Dockerfile
+    image: music-gatherings-ingestion-ultimate-guitar:local
+    networks:
+      - app-net
+    restart: unless-stopped
+    # No published ports: explicitly disabled (no licensed UG API exists).
+
   # Later slices add private (unpublished) services on app-net:
   # - worker (S06): durable job execution, shares app-data volume.
   # - ingestion-genius, ingestion-ultimate-guitar (S07/S08): rate-limited providers.

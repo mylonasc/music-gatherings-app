@@ -47,6 +47,16 @@ class ForbiddenError(ProviderError):
         super().__init__(code="forbidden", message=message, retryable=False)
 
 
+class NotConfiguredError(ProviderError):
+    def __init__(self, message: str = "provider not configured"):
+        super().__init__(code="not_configured", message=message, retryable=False)
+
+
+class ProviderUnavailableError(ProviderError):
+    def __init__(self, message: str = "provider unavailable"):
+        super().__init__(code="provider_unavailable", message=message, retryable=False)
+
+
 class InvalidResponseError(ProviderError):
     def __init__(self, message: str = "invalid provider response"):
         super().__init__(code="invalid_response", message=message, retryable=False)
