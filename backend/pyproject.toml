@@ -11,6 +11,8 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+# B008 flags `Depends(...)` in defaults, which is the standard FastAPI idiom.
+ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "migrations/versions/*.py" = ["E501", "I001"]

@@ -13,6 +13,7 @@ EXPECTED_TABLES = {
     "artifact_derivations",
     "artifacts",
     "audit_events",
+    "auth_sessions",
     "crew_memberships",
     "crew_tracks",
     "crews",

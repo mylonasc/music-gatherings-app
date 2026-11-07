@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -45,3 +46,16 @@ def sqlite_pragma(db_file: Path, name: str) -> object:
         return row[0]
     finally:
         con.close()
+
+
+def make_test_app(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, **env: str):  # type: ignore[no-untyped-def]
+    """Build an isolated app: fresh SQLite file, migrated via metadata."""
+    from app.main import create_app
+
+    db_file = tmp_path / "app.db"
+    monkeypatch.setenv("MUSIC_GATHERINGS_DATABASE_URL", f"sqlite:///{db_file}")
+    for key, value in env.items():
+        monkeypatch.setenv(key, value)
+    app = create_app()
+    Base.metadata.create_all(app.state.engine)
+    return app, TestClient(app)
