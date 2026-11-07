@@ -76,6 +76,8 @@ unless the task authorizes it. Preserve unrelated user changes.
   automatically before starting the API).
 - S03 commands: `python -m app.cli create-admin --username <name>` from
   `backend/` (or `docker compose exec backend ...`) with the database migrated.
+- S16 operations: `./deploy/backup.sh` / `./deploy/restore.sh` from the repo
+  root (see `deploy/OPERATIONS.md`); never commit `.env` or `backups/`.
 
 ## Workflow and maintaining this file
 

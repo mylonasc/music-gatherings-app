@@ -1,6 +1,9 @@
 # Epic: Bootstrap the Music Gatherings App
 
-Status: S01–S15 implemented on `main`. S16 remains.
+Status: **Complete.** S01–S16 are implemented on `main`; all slice issues are
+closed. What remains is continuous work outside this epic: real-device mobile
+checks, webkit CI signal, and provider evolution (see `deploy/OPERATIONS.md`
+known limitations).
 
 ## 1. Purpose and scope
 

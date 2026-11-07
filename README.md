@@ -170,5 +170,8 @@ deploy/             Ops notes; Compose file lives at repo root
 
 ## CI
 
-`ci.yml` runs backend lint/type/tests, frontend typecheck/build, `docker compose
-config`, image builds, and a tracked-secrets check on every push/PR to `main`.
+`ci.yml` runs backend lint/type/tests, frontend typecheck/tests/build,
+services lint/type/tests, `docker compose config`, all image builds,
+Playwright E2E (chromium + webkit, seeded stack), a backup/restore recovery
+cycle, and a tracked-secrets check on every push/PR to `main`. See
+`deploy/OPERATIONS.md` for deployment, backup, upgrade, and troubleshooting.
