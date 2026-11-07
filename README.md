@@ -138,6 +138,11 @@ and piano filters, local library search with lyric snippets, online provider
 search with job progress and explicit import, version lists, artifact
 downloads, and audience/guitar/piano representation tabs with scroll-contained
 notation panels. Playwright journeys cover all of these (`tests/e2e`).
+
+Administration (`/admin`, admins only): access-request approvals, provider
+status with isolated search/fetch tests (never stored), processing-profile
+versions with registry validation, isolated processor previews with
+diagnostics, job oversight with cancellation, and the audit trail.
 contracts/          Versioned service contracts (S07 ingestion, S09 processor)
 services/ingestion/ Provider adapters (S07 common/fake, S08 genius/UG)
 services/processor/ Normalization/post-processing (S09)
