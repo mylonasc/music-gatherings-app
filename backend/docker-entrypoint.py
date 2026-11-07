@@ -45,7 +45,10 @@ def main() -> None:
         cwd="/app",
         check=True,
     )
-    os.execvp("uvicorn", ["uvicorn", *sys.argv[1:]])
+    args = sys.argv[1:]
+    if args and (args[0] == "-m" or args[0].endswith(".py")):
+        os.execvp(sys.executable, [sys.executable, *args])
+    os.execvp("uvicorn", ["uvicorn", *args])
 
 
 if __name__ == "__main__":

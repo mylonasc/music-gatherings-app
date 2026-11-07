@@ -28,6 +28,24 @@ services:
       - app-net
     restart: unless-stopped
 
+  worker:
+    build:
+      context: ./backend
+    image: music-gatherings-backend:local
+    # Shares the backend image; entrypoint migrates then execs this command.
+    command: ["-m", "app.worker"]
+    environment:
+      MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
+      MUSIC_GATHERINGS_DATABASE_URL: sqlite:////data/database/app.sqlite3
+    volumes:
+      - app-data:/data
+    depends_on:
+      - backend
+    networks:
+      - app-net
+    restart: unless-stopped
+    # No published ports: the worker is only reachable via the private network.
+
   # Later slices add private (unpublished) services on app-net:
   # - worker (S06): durable job execution, shares app-data volume.
   # - ingestion-genius, ingestion-ultimate-guitar (S07/S08): rate-limited providers.
