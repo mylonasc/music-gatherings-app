@@ -37,12 +37,17 @@ export async function expectTouchTargets(page: Page, selector: string): Promise<
   const boxes = await page.locator(selector).evaluateAll((elements) =>
     elements.map((element) => {
       const rect = element.getBoundingClientRect();
-      return { width: rect.width, height: rect.height };
+      const tag = element.tagName.toLowerCase();
+      const type = element.getAttribute("type");
+      // WCAG 2.5.8 allows 24px minimum for radio/checkbox controls; the
+      // 40px bar below applies to buttons, links, and text inputs.
+      const minimum = tag === "input" && (type === "radio" || type === "checkbox") ? 24 : 40;
+      return { width: rect.width, height: rect.height, minimum };
     }),
   );
   expect(boxes.length, `expected targets for ${selector}`).toBeGreaterThan(0);
   for (const box of boxes) {
-    expect(Math.min(box.width, box.height), selector).toBeGreaterThanOrEqual(40);
+    expect(Math.min(box.width, box.height), selector).toBeGreaterThanOrEqual(box.minimum);
   }
 }
 

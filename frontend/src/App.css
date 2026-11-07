@@ -83,6 +83,15 @@ body {
   width: 100%;
 }
 
+input[type="radio"],
+input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  vertical-align: middle;
+  accent-color: #1a3a8f;
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
