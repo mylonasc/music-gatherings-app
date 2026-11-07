@@ -7,11 +7,17 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.models import AuthSession, User
+from app.storage.local import LocalObjectStore
 
 
 def get_settings(request: Request) -> Settings:
     settings: Settings = request.app.state.settings
     return settings
+
+
+def get_store(request: Request) -> LocalObjectStore:
+    store: LocalObjectStore = request.app.state.object_store
+    return store
 
 
 def get_db(request: Request) -> Iterator[Session]:

@@ -48,6 +48,9 @@ class LocalObjectStore:
         self._staging = self._root / "staging"
         self._max_bytes = max_bytes
         self._stale_staging_seconds = stale_staging_seconds
+
+    def ensure_dirs(self) -> None:
+        """Create store directories. Called by operations and the entrypoint."""
         self._objects.mkdir(parents=True, exist_ok=True)
         self._staging.mkdir(parents=True, exist_ok=True)
 
@@ -58,6 +61,7 @@ class LocalObjectStore:
             raise ObjectTooLargeError(
                 f"object of {len(data)} bytes exceeds limit of {self._max_bytes}"
             )
+        self.ensure_dirs()
         key = self._fresh_key()
         shard_dir = self._objects / key.split("/")[0]
         shard_dir.mkdir(parents=True, exist_ok=True)
@@ -99,6 +103,8 @@ class LocalObjectStore:
 
     def reconcile(self) -> dict[str, int]:
         """Remove stale staging fragments. Returns counts of work done."""
+        if not self._staging.is_dir():
+            return {"removed_staging": 0}
         now = time.time()
         removed_staging = 0
         for entry in self._staging.iterdir():
@@ -114,6 +120,7 @@ class LocalObjectStore:
         """Test/maintenance helper: simulate an interrupted staging write."""
         if not _STAGING_RE.fullmatch(name):
             raise ObjectStoreError("invalid staging name")
+        self.ensure_dirs()
         path = self._staging / name
         path.write_bytes(data)
         return path

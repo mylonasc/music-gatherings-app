@@ -54,6 +54,7 @@ def make_test_app(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, **env: str): 
 
     db_file = tmp_path / "app.db"
     monkeypatch.setenv("MUSIC_GATHERINGS_DATABASE_URL", f"sqlite:///{db_file}")
+    monkeypatch.setenv("MUSIC_GATHERINGS_DATA_DIR", str(tmp_path / "data"))
     for key, value in env.items():
         monkeypatch.setenv(key, value)
     app = create_app()
