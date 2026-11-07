@@ -37,9 +37,13 @@ services:
     image: music-gatherings-backend:local
     # Shares the backend image; entrypoint migrates then execs this command.
     command: ["-m", "app.worker"]
-    # The shared image probes HTTP port 8000, which the worker does not serve.
+    # Process liveness only, not job-progress/lease health. No worker HTTP server.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-c", "from pathlib import Path; import sys; sys.exit(0 if b'app.worker' in Path('/proc/1/cmdline').read_bytes().split(b'\\0') else 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
     environment:
       MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
       MUSIC_GATHERINGS_DATABASE_URL: sqlite:////data/database/app.sqlite3

@@ -97,6 +97,11 @@ jobs:
           curl -sf -X POST http://localhost:8000/api/v1/auth/login -H 'Content-Type: application/json' -d "{\"username\":\"root\",\"password\":\"${RECOVERY_PASSWORD}\"}" -c "${COOKIE_JAR}" -o /dev/null
           COUNT="$(curl -sf "http://localhost:8000/api/v1/crews/${CREW_ID}/tracks?limit=1" -b "${COOKIE_JAR}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["total"])')"
           test "${COUNT}" = "1"
+      - name: Stack diagnostics on failure
+        if: failure()
+        run: |
+          docker compose ps -a
+          docker compose logs --no-color --tail=200
       - run: docker compose down -v
         if: always()
 
@@ -128,6 +133,11 @@ jobs:
           path: |
             tests/e2e/test-results/
             tests/e2e/playwright-report/
+      - name: Stack diagnostics on failure
+        if: failure()
+        run: |
+          docker compose ps -a
+          docker compose logs --no-color --tail=200
       - run: docker compose down -v
         if: always()
 
