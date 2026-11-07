@@ -57,6 +57,11 @@ unless the task authorizes it. Preserve unrelated user changes.
 
 ## Frontend and testing
 
+- UI replacement is tracked in `EPIC_UI_IMRPOVEMENTS.md` (parent #27, UI-01–UI-12).
+  Work on `implementation/ui-improvements`; reference owning issues in commits.
+  Shared visual tokens live in `frontend/src/styles/tokens.css`; use semantic
+  primitives through `components/ui` and avoid broad descendant section styling.
+
 - React/TypeScript, feature-oriented modules, reusable accessible primitives,
   generated API types, and consistent server-state handling.
 - Mobile first: 320 CSS px minimum layout, touch-friendly controls, keyboard/focus
