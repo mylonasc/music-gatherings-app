@@ -7,6 +7,7 @@ coalescing (upstream hits stay at 1 for repeated/identical requests).
 
 from fastapi import FastAPI, HTTPException, Request
 
+from common.alimiter import AsyncLimiter
 from common.contracts import (
     ArtifactType,
     CapabilityResponse,
@@ -19,6 +20,8 @@ from common.contracts import (
     SearchResponse,
     StatsResponse,
 )
+from common.inbound import InboundRateLimitMiddleware
+from common.limits import LimiterConfig, OperationLimits
 
 SERVICE_VERSION = "0.1.0"
 
@@ -53,6 +56,15 @@ _FIXTURES = [
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Fake Ingestion Provider", version=SERVICE_VERSION)
+    # Generous inbound gate: the fake has no upstream, but admin/test traffic
+    # still flows through the same limiting machinery (and stats stay honest).
+    generous = LimiterConfig(
+        overall=OperationLimits(1000, 60.0, burst=100),
+        search=OperationLimits(1000, 60.0, burst=100),
+        fetch=OperationLimits(1000, 60.0, burst=100),
+    )
+    app.state.limiter = AsyncLimiter(generous)
+    app.add_middleware(InboundRateLimitMiddleware, limiter=app.state.limiter)
     app.state.search_count = 0
     app.state.fetch_count = 0
 

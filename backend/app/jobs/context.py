@@ -18,6 +18,18 @@ class JobTimedOut(Exception):
     pass
 
 
+class RetryLater(Exception):
+    """Requeue the job after ``delay_seconds`` without counting an attempt.
+
+    Used for provider throttling with an explicit Retry-After: normal flow
+    control, not a failure. Attempts still increment to keep requeues bounded.
+    """
+
+    def __init__(self, delay_seconds: float, message: str = "provider throttled") -> None:
+        super().__init__(message)
+        self.delay_seconds = max(0.0, min(300.0, delay_seconds))
+
+
 @dataclass
 class JobContext:
     job_id: str

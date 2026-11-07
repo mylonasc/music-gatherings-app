@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.jobs.context import JobCancelled, JobContext, JobTimedOut
+from app.jobs.context import JobCancelled, JobContext, JobTimedOut, RetryLater
 from app.models import Job
 from app.models.base import utcnow_naive
 from app.storage.local import LocalObjectStore
@@ -208,6 +208,26 @@ def run_claimed_job(
     )
     try:
         result = kind.handler(ctx)
+    except RetryLater as exc:
+        db.rollback()
+        fresh = db.get(Job, job.id)
+        assert fresh is not None
+        retry_limit = _retry_limit(kind, settings)
+        fresh.attempts += 1
+        if fresh.attempts > retry_limit:
+            fresh.status = "failed"
+            fresh.error = f"throttled too many times: {exc}"
+            fresh.finished_at = utcnow_naive()
+        else:
+            fresh.status = "queued"
+            fresh.wait_reason = (
+                f"provider throttled; retrying ({fresh.attempts}/{retry_limit})"
+            )
+            fresh.available_at = utcnow_naive() + timedelta(seconds=exc.delay_seconds)
+        fresh.worker_id = None
+        fresh.lease_expires_at = None
+        db.flush()
+        return fresh
     except (JobCancelled, JobTimedOut, KeyboardInterrupt) as exc:
         db.rollback()
         fresh = db.get(Job, job.id)

@@ -20,7 +20,10 @@ from common.contracts import (
     SearchResponse,
     StatsResponse,
 )
+from common.alimiter import AsyncLimiter
 from common.errors import ProviderError
+from common.inbound import InboundRateLimitMiddleware
+from common.limits import LimiterConfig
 
 
 def _envelope_response(error: ProviderError, http_status: int) -> JSONResponse:
@@ -45,8 +48,13 @@ def create_provider_app(
     search: Callable[[SearchRequest], Awaitable[SearchResponse]],
     fetch: Callable[[FetchRequest], Awaitable[FetchResponse]],
     stats: Callable[[], Awaitable[StatsResponse]],
+    limiter: AsyncLimiter | None = None,
+    inbound_limits: tuple[str, ...] = ("/v1/search", "/v1/fetch"),
 ) -> FastAPI:
     app = FastAPI(title=f"Ingestion provider: {service_name}", version=version)
+    app.add_middleware(
+        InboundRateLimitMiddleware, limiter=limiter or AsyncLimiter(LimiterConfig()), paths=inbound_limits
+    )
 
     @app.get("/health", response_model=HealthResponse)
     def health() -> HealthResponse:

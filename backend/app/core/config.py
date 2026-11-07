@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = 1.0
     worker_lease_seconds: float = 300.0
     worker_max_retries: int = 3
+    online_provider_urls: dict[str, str] = {
+        "fake": "http://ingestion-fake:8001",
+        "genius": "http://ingestion-genius:8002",
+        "ultimate_guitar": "http://ingestion-ultimate-guitar:8003",
+    }
+    processor_url: str = "http://processor:8004"
+    processor_timeout_seconds: float = 60.0
+    provider_timeout_seconds: float = 15.0
     session_ttl_seconds: int = 7 * 24 * 3600
     session_cookie_name: str = "mg_session"
     session_cookie_secure: bool = False
