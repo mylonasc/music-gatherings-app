@@ -147,8 +147,9 @@ function Representations({ trackId }: { trackId: string }) {
 }
 
 function DocPanel({ artifact }: { artifact: ArtifactOut }) {
+  const isText = artifact.mime_type === "text/plain" || artifact.mime_type === "application/x-lrc";
   const { data, error, loading } = useText(
-    artifact.is_external || artifact.mime_type !== "text/html"
+    artifact.is_external || (!isText && artifact.mime_type !== "text/html")
       ? null
       : `/api/v1/artifacts/${artifact.id}/content`,
   );
@@ -161,11 +162,18 @@ function DocPanel({ artifact }: { artifact: ArtifactOut }) {
       </p>
     );
   }
-  if (artifact.mime_type !== "text/html") {
+  if (!isText && artifact.mime_type !== "text/html") {
     return null;
   }
   if (loading) return <Loading label="Loading document…" />;
   if (error || data === null) return <ErrorNotice message={error ?? "Document unavailable."} />;
+  if (isText) {
+    return (
+      <pre className="doc-panel" role="region" aria-label={`${artifactLabel(artifact.kind)} document`} tabIndex={0}>
+        {data}
+      </pre>
+    );
+  }
   // The HTML is rendered by our own processor with escaping; it is never
   // raw provider content. The panel scrolls internally on narrow screens and
   // is keyboard-focusable so scrollable content stays operable (axe:

@@ -126,6 +126,30 @@ describe("track detail page", () => {
     vi.unstubAllGlobals();
   });
 
+  it.each(["text/plain", "application/x-lrc"])("renders %s lyrics as inert preformatted text", async (mime) => {
+    const text = "[00:01.00] Fixture line\n<script>window.compromised=true</script>\n";
+    installFetch((url) => {
+      if (url === "/api/v1/auth/me") return jsonResponse(200, demoUser);
+      if (url === "/api/v1/tracks/t1") return jsonResponse(200, {
+        id: "t1", title: "Fixture", genres: [], versions: [], crew_entries: [],
+      });
+      if (url.includes("/representations")) return jsonResponse(200, {
+        items: [{ artifact: { id: "a1", kind: "lyrics", mime_type: mime, is_external: false },
+                  source_provider: "lrclib", attribution: "Lyrics via LRCLIB", warnings: [] }],
+      });
+      if (url === "/api/v1/artifacts/a1/content") return new Response(text);
+      throw new Error(`unexpected ${url}`);
+    });
+    render(<MemoryRouter initialEntries={["/tracks/t1"]}>
+      <Routes><Route path="/tracks/:trackId" element={<TrackDetailPage />} /></Routes>
+    </MemoryRouter>);
+    const region = await screen.findByRole("region", { name: "lyrics document" });
+    expect(region.tagName).toBe("PRE");
+    expect(region.textContent).toBe(text);
+    expect(region.querySelector("script")).toBeNull();
+    expect(screen.getByText("Lyrics via LRCLIB")).toBeInTheDocument();
+  });
+
   it("renders versions with artifact links", async () => {
     installFetch((url) => {
       if (url === "/api/v1/auth/me") return jsonResponse(200, demoUser);

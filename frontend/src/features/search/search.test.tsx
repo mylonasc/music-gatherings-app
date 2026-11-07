@@ -80,6 +80,8 @@ describe("online search page", () => {
       </MemoryRouter>,
     );
     await user.type(await screen.findByLabelText("Song or artist"), "blue train");
+    expect(screen.getByLabelText("LRCLIB")).toBeInTheDocument();
+    expect(screen.queryByLabelText(/genius/i)).not.toBeInTheDocument();
     const searchButton = await screen.findByRole("button", { name: "Search online" });
     await waitFor(() => expect(searchButton).toBeEnabled());
     await user.click(searchButton);

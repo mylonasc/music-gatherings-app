@@ -7,7 +7,7 @@ import { useGet } from "../../lib/use-api";
 import { useJob } from "../../lib/use-job";
 import { ErrorNotice, Field, Page } from "../../components/ui";
 
-const PROVIDERS = ["fake", "genius", "ultimate_guitar"] as const;
+const PROVIDERS = ["fake", "lrclib", "ultimate_guitar"] as const;
 
 interface SearchHit {
   provider: string;
@@ -17,6 +17,7 @@ interface SearchHit {
   artifact_types: string[];
   source_url: string | null;
   attribution: string | null;
+  warnings?: string[];
 }
 
 export function OnlineSearchPage() {
@@ -59,7 +60,7 @@ export function OnlineSearchPage() {
         external_id: hit.external_id,
         crew_id: crewId,
       });
-      setImportJobs((prev) => ({ ...prev, [hit.external_id]: job.id }));
+      setImportJobs((prev) => ({ ...prev, [`${hit.provider}:${hit.external_id}`]: job.id }));
     } catch (err: unknown) {
       setSubmitError(err instanceof ApiError ? err.message : "Import failed to start.");
     }
@@ -109,7 +110,7 @@ export function OnlineSearchPage() {
                   )
                 }
               />{" "}
-              {provider.replaceAll("_", " ")}
+              {provider === "lrclib" ? "LRCLIB" : provider.replaceAll("_", " ")}
             </label>
           ))}
         </fieldset>
@@ -149,9 +150,10 @@ export function OnlineSearchPage() {
                   </a>
                 </p>
               )}
+              {(hit.warnings ?? []).map((warning, index) => <p key={index}>{warning}</p>)}
               <ImportControl
                 hit={hit}
-                jobId={importJobs[hit.external_id] ?? null}
+                jobId={importJobs[`${hit.provider}:${hit.external_id}`] ?? null}
                 onImport={() => void importHit(hit)}
               />
             </li>
@@ -192,10 +194,12 @@ function ImportControl({
   }
   const trackId = (job.result as { track_id?: string } | null)?.track_id;
   const reused = (job.result as { reused?: boolean } | null)?.reused;
+  const warnings = (job.result as { warnings?: string[] } | null)?.warnings ?? [];
   return (
-    <p role="status">
+    <div role="status">
       Imported{reused ? " (already in the library)" : ""}.{" "}
       {trackId && <Link to={`/tracks/${trackId}`}>Open the track</Link>}
-    </p>
+      {warnings.map((warning, index) => <p key={index}>{warning}</p>)}
+    </div>
   );
 }
