@@ -37,7 +37,9 @@ Environment variables (all optional unless noted):
 | `MUSIC_GATHERINGS_ONLINE_IMPORT_PER_USER_PER_HOUR` | 20 | per-user import quota |
 | `MUSIC_GATHERINGS_PROCESSOR_URL` | `http://processor:8004` | normalization service |
 | `MUSIC_GATHERINGS_PROVIDER_TIMEOUT_SECONDS` | 15 | provider HTTP timeout |
-| `GENIUS_ACCESS_TOKEN` | unset | enables the Genius adapter (search/metadata only) |
+| `LRCLIB_ALLOW_STORAGE` | true | personal local lyric imports; set false for reference-only behavior where rights are unknown |
+| `LRCLIB_REQUESTS_PER_MINUTE` | 20 | LRCLIB overall outbound quota (search 6/min, fetch 10/min also apply) |
+| `LRCLIB_MIN_INTERVAL_SECONDS` | 0.5 | minimum outbound spacing; must be between 0.2 and 60 seconds |
 | `E2E_*`, `SEED_*` | unset | test-only knobs, never production |
 
 Secrets live only in the environment (or a secrets manager mounting them as
@@ -90,8 +92,11 @@ stopped-stack tarball plus the SQLite files is a coherent snapshot. The CI
 
 ## Known limitations (product, not bugs)
 
-- **Genius**: official API metadata only (search + song pages, reference-only).
-  Lyrics require publisher licensing; scraping them violates Genius' ToS.
+- **LRCLIB**: personal local plain/LRC lyric imports, no OAuth/key. Coverage and
+  accuracy depend on community records; some tracks are instrumental or missing
+  lyrics. LRC is preserved but not played in sync. API availability is not a
+  blanket redistribution license; disable storage for deployments without rights.
+  Genius has been retired; its existing source records remain intact.
 - **Ultimate Guitar**: explicitly disabled — no public or licensed API
   exists, and scraping would violate ToS/publisher rights. The service
   returns structured 503s until a licensed API exists.

@@ -74,7 +74,7 @@ test.describe("narrow viewport documents", () => {
     // Wait for the guitar rendering itself, not just any panel: the previous
     // context's panel stays mounted until the new fetch resolves.
     await expect(page.locator(".doc-panel .chord-line").first()).toBeVisible();
-    const panel = page.locator(".doc-panel").first();
+    const panel = page.getByRole("region", { name: "rendered chord chart document" }).first();
     await expect(panel).toBeVisible();
     const containment = await panel.evaluate((element) => ({
       panelScrolls: element.scrollWidth > element.clientWidth + 1,
@@ -86,5 +86,18 @@ test.describe("narrow viewport documents", () => {
     expect(containment.panelScrolls, "wide notation scrolls inside its panel").toBe(true);
     await expectNoSeriousA11yViolations(page);
     await expectTouchTargets(page, "main button, main input, main select, header nav a");
+  });
+
+  test("plain lyrics stay inert and scroll locally at 320px", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(`/tracks/${loadSeed().trackId}`);
+    const lyrics = page.getByRole("region", { name: "lyrics document", exact: true });
+    await expect(lyrics).toContainText("Rolling down the test track line");
+    await expect(lyrics).toContainText("<script>window.fixtureExecuted=true</script>");
+    expect(await lyrics.evaluate((element) => element.tagName)).toBe("PRE");
+    await expect(lyrics.locator("script")).toHaveCount(0);
+    expect(await lyrics.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+    await expectNoPageOverflow(page);
+    await expectNoSeriousA11yViolations(page);
   });
 });

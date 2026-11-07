@@ -123,7 +123,11 @@ const version = (
     body: { label: "Seeded" },
   })
 ).json;
-const lyrics = new Blob(["Rolling down the test track line\n"], { type: "text/plain" });
+const lyrics = new Blob([
+  "Rolling down the test track line\n",
+  "wide-fixture-line ".repeat(40),
+  "\n<script>window.fixtureExecuted=true</script>\n",
+], { type: "text/plain" });
 const uploadForm = new FormData();
 uploadForm.set("file", lyrics, "seed-lyrics.txt");
 uploadForm.set("kind", "lyrics");

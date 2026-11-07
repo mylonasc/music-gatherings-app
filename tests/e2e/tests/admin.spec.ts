@@ -65,8 +65,9 @@ test("provider test search shows fixtures and leaves the library alone", async (
   await page.getByRole("tab", { name: "providers" }).click();
   await expect(page.getByText("fake", { exact: true }).first()).toBeVisible();
   const before = await trackTotal();
-  await page.getByLabel("Test query").fill("blue");
-  await page.getByRole("button", { name: "Search fake" }).click();
+  const fakeForm = page.getByRole("form", { name: "Test fake" });
+  await fakeForm.getByLabel("Test query").fill("blue");
+  await fakeForm.getByRole("button", { name: "Search fake" }).click();
   await expect(page.getByText("Blue Test Train")).toBeVisible({ timeout: 30_000 });
   expect(await trackTotal()).toBe(before);
 });

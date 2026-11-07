@@ -102,11 +102,29 @@ deterministic `ingestion-fake` provider on the private network
 (`http://ingestion-fake:8001`, no published ports).
 
 Providers (see `services/ingestion/PROVIDERS.md` for the capability/rights
-matrix): `ingestion-genius` uses only the official Genius API
-(`GENIUS_ACCESS_TOKEN`) for search/metadata — reference-only, never scraped,
-never stored; `ingestion-ultimate-guitar` is explicitly disabled (no public
+matrix): `ingestion-lrclib` uses the official LRCLIB API (no key/OAuth) for
+search and personal local imports of plain lyrics and original timestamped LRC.
+The audience view displays lyrics as inert, preformatted text; LRC timestamps
+are preserved, not used for synchronized playback. Instrumental/missing-lyrics
+results show a warning rather than fabricated text. Set `LRCLIB_ALLOW_STORAGE=false`
+for reference-only imports where storage/sharing rights are not established.
+`ingestion-ultimate-guitar` is explicitly disabled (no public
 or licensed UG API exists; scraping would violate ToS/publisher rights) and
 returns structured 503s. Both publish no ports.
+
+Genius has been retired: existing Genius source records and downloaded artifacts
+remain untouched, but new Genius searches/imports are rejected (IDs are not
+reinterpreted as LRCLIB IDs). Existing queued Genius jobs fail rather than being
+redirected to LRCLIB. After updating, run `docker compose up -d --build`; an old
+Genius container may be reported as an orphan. You may stop that specific old
+container without deleting data volumes. Legacy `GENIUS_*` variables are unused.
+
+Optional live check (uses production throttling; prints sizes, not full lyrics):
+
+```bash
+docker compose up -d --build --wait ingestion-lrclib
+docker compose exec ingestion-lrclib python -m lrclib.smoke "The Beatles Yesterday"
+```
 
 Processor (`services/processor/`, private `http://processor:8004`): parses
 plain-text chord charts into versioned canonical documents, applies a
@@ -179,7 +197,7 @@ curl -X POST /api/v1/agent/tools/search -H "Authorization: Bearer $TOKEN" \
   http://localhost:8000/api/v1/agent/tools/search
 ```
 contracts/          Versioned service contracts (S07 ingestion, S09 processor)
-services/ingestion/ Provider adapters (S07 common/fake, S08 genius/UG)
+services/ingestion/ Provider adapters (common/fake, LRCLIB, disabled UG)
 services/processor/ Normalization/post-processing (S09)
 tests/e2e/          Playwright flows (from S12)
 deploy/             Ops notes; Compose file lives at repo root

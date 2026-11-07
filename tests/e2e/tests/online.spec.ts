@@ -5,6 +5,8 @@ test.use({ storageState: ".auth/member.json" });
 
 test("online search finds the fake provider hit and imports it", async ({ page }) => {
   await page.goto("/search");
+  await expect(page.getByRole("checkbox", { name: "LRCLIB", exact: true })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: /genius/i })).toHaveCount(0);
   await page.getByLabel("Song or artist").fill("blue");
   // Fake provider only (the default): deterministic, no live upstream.
   await page.getByRole("button", { name: "Search online" }).click();

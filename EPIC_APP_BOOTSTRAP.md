@@ -68,7 +68,7 @@ React UI / scoped agent clients
        durable job worker
              |
        private HTTP service network
-             +-- Genius ingestion
+             +-- LRCLIB ingestion (replaces Genius)
              +-- Ultimate Guitar ingestion
              +-- future provider adapters
              +-- normalization / post-processing
@@ -188,7 +188,14 @@ Results include provider/external IDs, source URL, optional metadata, available
 formats, attribution, rights, warnings, and confidence where meaningful. Use
 structured errors, correlation IDs, bounded response sizes, and explicit timeouts.
 
-Investigate `lyricsgenius` and the requested `ultimateultimateguitar` integration:
+The original investigation covered `lyricsgenius` and the requested
+`ultimateultimateguitar` integration. Genius is now replaced by the official
+LRCLIB read-only search/get API for the user's personal local lyric library:
+no credentials, plain/LRC artifacts kept separate, identifying User-Agent and
+conservative per-attempt throttling. Preserve historic Genius provenance without
+remapping IDs. Local storage is enabled for the requested personal setup; for
+broader deployments with unknown rights, use `LRCLIB_ALLOW_STORAGE=false`.
+For any future provider:
 verify exact package identity, maintenance, supported capabilities, credentials,
 licenses, upstream terms, and safe sample results before committing to an adapter.
 Do not assume these libraries can legally download and redistribute all content.
@@ -359,7 +366,7 @@ later wrap these same application services; it is not required for initial deliv
 
 ## 14. Containers and operations
 
-Compose services: `backend`, `worker`, `ingestion-genius`,
+Compose services: `backend`, `worker`, `ingestion-lrclib`,
 `ingestion-ultimate-guitar`, and `processor`; include a frontend build/serving path.
 Use a named `app-data` volume shared by backend/worker for database and objects.
 Provider/processor containers do not mount it. Only publish necessary UI/API ports.
@@ -491,7 +498,7 @@ Acceptance:
 - `Retry-After`, cancellation, restart cooldown, bounded queues, and circuit recovery work.
 - Admin/test traffic cannot bypass limits; effective configuration is observable.
 
-### S08 — Validated Genius and Ultimate Guitar adapters
+### S08 — Validated provider adapters (LRCLIB replaces original Genius; UG disabled)
 
 Dependencies: S07.
 

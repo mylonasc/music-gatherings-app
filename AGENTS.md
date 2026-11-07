@@ -20,6 +20,11 @@ unless the task authorizes it. Preserve unrelated user changes.
   search, authorization, artifact serving, jobs, and orchestration.
 - Private HTTP microservices: provider ingestion and normalization/post-processing.
   No user auth duplication and no public host ports for these services.
+- LRCLIB (`services/ingestion/lrclib/`, internal 8002) replaces Genius. No OAuth/key;
+  preserve plain text and timestamped LRC separately and never render them as HTML.
+  Personal local imports are enabled for the requested private setup; broader
+  deployments need applicable rights or `LRCLIB_ALLOW_STORAGE=false` references.
+  Keep historic Genius provenance intact; never remap its IDs to LRCLIB.
 - SQLite + SQLAlchemy/Alembic initially; FTS5 with explicit typo-tolerant search.
   Enforce foreign keys, ownership, unique constraints, and short write transactions.
 - Immutable objects behind an object-store interface; local named Docker volume
@@ -88,6 +93,10 @@ unless the task authorizes it. Preserve unrelated user changes.
   or publish private services to resolve host conflicts. Validate mappings with
   `python3 -m unittest discover -s tests -p test_compose_config.py` (requires Docker
   Compose, no running containers or daemon needed).
+- Service validation from `services/`: `python3 -m pytest ingestion/tests processor/tests -q`;
+  from `services/ingestion/`: `python3 -m ruff check common fake lrclib ultimateguitar tests`
+  and `python3 -m mypy common fake lrclib ultimateguitar`. Live calls are opt-in:
+  `docker compose exec ingestion-lrclib python -m lrclib.smoke "artist song"`.
 
 ## Workflow and maintaining this file
 
