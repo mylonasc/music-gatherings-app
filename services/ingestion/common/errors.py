@@ -3,6 +3,7 @@
 import email.utils
 import time
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -12,8 +13,8 @@ class ProviderError(Exception):
     retryable: bool = False
     retry_after_seconds: float | None = None
 
-    def to_envelope(self) -> dict:
-        envelope: dict = {
+    def to_envelope(self) -> dict[str, Any]:
+        envelope: dict[str, Any] = {
             "error": {"code": self.code, "message": self.message, "retryable": self.retryable}
         }
         if self.retry_after_seconds is not None:
@@ -51,7 +52,13 @@ class InvalidResponseError(ProviderError):
         super().__init__(code="invalid_response", message=message, retryable=False)
 
 
-def parse_retry_after(value: str | None, *, now: float | None = None, default: float = 30.0, cap: float = 300.0) -> float:
+def parse_retry_after(
+    value: str | None,
+    *,
+    now: float | None = None,
+    default: float = 30.0,
+    cap: float = 300.0,
+) -> float:
     """Parse a Retry-After header (delta seconds or HTTP date), bounded by cap."""
     if not value:
         return default

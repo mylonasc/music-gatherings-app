@@ -51,7 +51,8 @@ class LimitedHttpClient:
 
     def backoff_for_attempt(self, attempt: int) -> float:
         capped = min(self._backoff_cap, self._backoff_base * (2**attempt))
-        return capped + random.uniform(0, min(capped, 1.0))
+        backoff: float = capped + random.uniform(0, min(capped, 1.0))
+        return backoff
 
     async def request(self, operation: str, method: str, url: str, **kwargs: Any) -> httpx.Response:
         last_error: ProviderError | None = None

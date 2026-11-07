@@ -10,7 +10,7 @@ import hashlib
 import json
 import time
 from collections import OrderedDict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -41,7 +41,7 @@ class ResponseCache:
         self._max_entries = max(1, max_entries)
         self._clock = clock or time.monotonic
         self._entries: OrderedDict[str, tuple[float, Any]] = OrderedDict()
-        self._in_flight: dict[str, asyncio.Future] = {}
+        self._in_flight: dict[str, asyncio.Future[Any]] = {}
         self._lock = asyncio.Lock()
         self._stats = CacheStats()
 
@@ -83,7 +83,7 @@ class ResponseCache:
                 self._entries.pop(key, None)
             ongoing = self._in_flight.get(key)
             if ongoing is None:
-                waiter: asyncio.Future = asyncio.get_running_loop().create_future()
+                waiter: asyncio.Future[Any] = asyncio.get_running_loop().create_future()
                 self._in_flight[key] = waiter
                 self._stats.misses += 1
             else:
