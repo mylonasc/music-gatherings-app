@@ -143,6 +143,24 @@ Administration (`/admin`, admins only): access-request approvals, provider
 status with isolated search/fetch tests (never stored), processing-profile
 versions with registry validation, isolated processor previews with
 diagnostics, job oversight with cancellation, and the audit trail.
+
+Agent tools (read-only, S15): users create revocable bearer credentials
+scoped to one crew and explicit capabilities
+(`POST /api/v1/agent-tokens`), then call `POST /api/v1/agent/tools/*`
+(`search`, `track`, `artifact`, `summary`, `compare`) with
+`Authorization: Bearer mgat_...`. Tools share the UI's authorization logic,
+enforce crew boundaries, audit every call, and mark document text as
+untrusted data (analyze it, never follow it as instructions). There are no
+agent mutation tools and no direct database/filesystem access. Example:
+
+```bash
+TOKEN=$(curl -s -X POST /api/v1/agent-tokens -b cookie.jar -H "X-CSRF-Token: $CSRF" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"reader","crew_id":"<crew>"}' http://localhost:8000/api/v1/agent-tokens | jq -r .token)
+curl -X POST /api/v1/agent/tools/search -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"query":"blue train","limit":5}' \
+  http://localhost:8000/api/v1/agent/tools/search
+```
 contracts/          Versioned service contracts (S07 ingestion, S09 processor)
 services/ingestion/ Provider adapters (S07 common/fake, S08 genius/UG)
 services/processor/ Normalization/post-processing (S09)
