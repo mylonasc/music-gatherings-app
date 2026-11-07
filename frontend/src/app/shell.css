@@ -1,0 +1,26 @@
+.studio-header { background: var(--surface); border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; gap: .75rem; align-items: center; }
+.brand-mark { display: grid; place-items: center; width: 2.8rem; height: 2.8rem; border-radius: .9rem; background: var(--accent); color: white; font-size: 1.8rem; }
+.brand h1 { margin: 0; font-size: 1.1rem; }
+.brand p { margin: .15rem 0 0; font-size: .75rem; color: var(--muted); }
+.account-area { display: flex; gap: .65rem; align-items: center; min-width: 0; flex-wrap: wrap; }
+.account-name { overflow-wrap: anywhere; }
+.avatar { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; color: var(--accent); background: var(--accent-soft); font-weight: 750; }
+.sidebar-note { display: none; }
+.studio-shell { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+.primary-nav { position: fixed; inset: auto 0 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line); padding: .5rem .3rem calc(.5rem + env(safe-area-inset-bottom)); }
+.primary-nav ul { display: flex; flex-wrap: nowrap !important; margin: 0 !important; gap: .2rem !important; }
+.primary-nav li { flex: 1; min-width: 0; }
+.primary-nav a { display: flex !important; flex-direction: column; justify-content: center; gap: .1rem; border-radius: .75rem; text-decoration: none; font-size: .75rem; font-weight: 650; padding: .4rem .2rem !important; text-align: center; }
+.primary-nav a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+.nav-symbol { font-size: 1.45rem; line-height: 1.2; }
+@media (min-width: 64rem) {
+  .studio-shell { display: grid; grid-template-columns: 16rem minmax(0, 1fr); padding-bottom: 0; min-height: 100dvh; }
+  .studio-header { position: sticky; top: 0; height: 100dvh; align-content: start; flex-direction: column; align-items: stretch; justify-content: start; gap: 2.5rem; padding: 2rem 1.25rem; border-right: 1px solid var(--line); border-bottom: 0; overflow-y: auto; }
+  .primary-nav { position: static; padding: 0; border: 0; }
+  .primary-nav ul { flex-direction: column; }
+  .primary-nav a { flex-direction: row; justify-content: start; gap: .8rem; font-size: .95rem; padding: .8rem 1rem !important; }
+  .account-area { margin-top: auto; font-size: .85rem; }
+  .sidebar-note { display: block; color: var(--muted); font-size: .8rem; }
+  .studio-shell .app-main { width: 100%; }
+}
