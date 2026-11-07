@@ -45,6 +45,7 @@ export function TracksPage() {
       <div className="library-intro"><div><h3>The soundtrack to your next gathering.</h3>
       <p>Find a favourite, cast your vote, or bring something new to the crew.</p></div>
       {user && <span className="badge">{crews?.[0]?.name ?? user.username}</span>}</div>
+      <p><Link className="action-link" to="/add">+ Bring a song</Link></p>
       {crewsLoading && <Loading label="Loading your crew…" />}
       {crewsError && <ErrorNotice message={crewsError} />}
       {!crewsLoading && !crewsError && crews?.length === 0 && (

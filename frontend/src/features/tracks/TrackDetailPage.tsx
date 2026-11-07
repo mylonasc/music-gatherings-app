@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ErrorNotice, Loading, Page } from "../../components/ui";
 import { useGet } from "../../lib/use-api";
 import { DocumentViewer } from "./viewers/DocumentViewer";
+import { MaterialForm } from "../adding/MaterialForm";
 import type { ArtifactOut, RepresentationResponse, TrackDetail, VersionDetailOut } from "../../lib/api-types";
 
 function artifactLabel(kind: string): string {
@@ -53,6 +54,7 @@ export function TrackDetailPage() {
         </section>
       ))}
       <h3>Versions and materials</h3>
+      <MaterialForm key={data.id} trackId={data.id} versions={data.versions} onSaved={reload} />
       {data.versions.length === 0 && <p role="status">No versions yet.</p>}
       {trackId && <Representations key={trackId} trackId={trackId} />}
       {data.versions.map((version: VersionDetailOut) => (

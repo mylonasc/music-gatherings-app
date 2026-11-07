@@ -39,8 +39,10 @@ interface ApiOptions {
 export async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const method = (options.method ?? "GET").toUpperCase();
   const headers: Record<string, string> = {};
-  let payload: string | undefined;
-  if (options.body !== undefined) {
+  let payload: string | FormData | undefined;
+  if (options.body instanceof FormData) {
+    payload = options.body;
+  } else if (options.body !== undefined) {
     headers["Content-Type"] = "application/json";
     payload = JSON.stringify(options.body);
   }

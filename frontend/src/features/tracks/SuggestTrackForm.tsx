@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, post } from "../../lib/api-client";
 import type { CrewTrackListItem, TrackSuggest } from "../../lib/api-types";
@@ -9,11 +9,14 @@ const PIANO_OPTIONS = ["unknown", "suggested", "not_suggested"] as const;
 export function SuggestTrackForm({
   crewId,
   onCreated,
+  initialOpen = false,
 }: {
   crewId: string;
   onCreated: (item: CrewTrackListItem) => void;
+  initialOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
+  const lock = useRef(false);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [description, setDescription] = useState("");
@@ -25,6 +28,8 @@ export function SuggestTrackForm({
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (lock.current) return;
+    lock.current = true;
     setFormError(null);
     setSubmitting(true);
     try {
@@ -49,6 +54,7 @@ export function SuggestTrackForm({
     } catch (err: unknown) {
       setFormError(err instanceof ApiError ? err.message : "Could not suggest the track.");
     } finally {
+      lock.current = false;
       setSubmitting(false);
     }
   }
@@ -62,7 +68,7 @@ export function SuggestTrackForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate aria-label="Suggest a track">
+    <form className="suggest-form" onSubmit={onSubmit} noValidate aria-label="Suggest a track">
       <h3>Suggest a track</h3>
       {formError && <ErrorNotice message={formError} />}
       <Field id="suggest-title" label="Title (optional)">
@@ -118,7 +124,7 @@ export function SuggestTrackForm({
         <button type="submit" disabled={submitting}>
           {submitting ? "Suggesting…" : "Suggest"}
         </button>{" "}
-        <button type="button" onClick={() => setOpen(false)}>
+        <button type="button" disabled={submitting} onClick={() => setOpen(false)}>
           Cancel
         </button>
       </div>
