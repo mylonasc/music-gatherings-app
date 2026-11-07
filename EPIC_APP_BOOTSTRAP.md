@@ -2,9 +2,10 @@
 
 Status: **Implemented, not release-verified.** S01–S16 are on `main` and the
 original slice issues are closed, but review identified material gaps tracked in
-[#18–#25](https://github.com/mylonasc/music-gatherings-app/issues?q=is%3Aissue+is%3Aopen).
+[#18–#26](https://github.com/mylonasc/music-gatherings-app/issues?q=is%3Aissue+is%3Aopen).
 These include HTML trust, worker leases, import recovery, search correctness,
-musical alignment, destructive restore safety, storage cleanup, and stale UI state.
+musical alignment, destructive restore safety, storage cleanup, stale UI state,
+and provider limiter dispatch/queue races.
 Do not interpret implementation completion as production readiness or successful CI.
 
 ## 1. Purpose and scope

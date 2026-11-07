@@ -3,7 +3,7 @@
 ## Current state and source of truth
 
 S01–S16 implementations are on `main`, but release readiness is not established:
-review follow-ups #18–#25 track security, durability, rendering, and recovery gaps.
+review follow-ups #18–#26 track security, durability, rendering, and recovery gaps.
 CI configuration is not evidence of a successful run. Read
 `EPIC_APP_BOOTSTRAP.md` for the architecture, stable S01–S16 slices, acceptance
 criteria, and dependency graph. Consult the linked GitHub parent/slice issues
