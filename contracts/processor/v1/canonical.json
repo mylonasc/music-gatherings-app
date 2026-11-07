@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "ChordPlacement": {
+      "properties": {
+        "position": {
+          "minimum": 0,
+          "title": "Position",
+          "type": "integer"
+        },
+        "chord": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Chord",
+          "type": "string"
+        }
+      },
+      "required": [
+        "position",
+        "chord"
+      ],
+      "title": "ChordPlacement",
+      "type": "object"
+    },
+    "LyricLine": {
+      "properties": {
+        "lyrics": {
+          "maxLength": 2000,
+          "title": "Lyrics",
+          "type": "string"
+        },
+        "chords": {
+          "items": {
+            "$ref": "#/$defs/canonical.ChordPlacement"
+          },
+          "title": "Chords",
+          "type": "array"
+        }
+      },
+      "required": [
+        "lyrics"
+      ],
+      "title": "LyricLine",
+      "type": "object"
+    },
+    "Section": {
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "default": "custom",
+          "enum": [
+            "intro",
+            "verse",
+            "pre_chorus",
+            "chorus",
+            "bridge",
+            "solo",
+            "interlude",
+            "outro",
+            "custom"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/canonical.LyricLine"
+          },
+          "title": "Lines",
+          "type": "array"
+        },
+        "tablature": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tablature",
+          "type": "array"
+        },
+        "repeat_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Repeat Of"
+        },
+        "repeat_count": {
+          "default": 1,
+          "maximum": 16,
+          "minimum": 1,
+          "title": "Repeat Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "title": "Section",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    },
+    "artist": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artist"
+    },
+    "musical_key": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Musical Key"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/canonical.Section"
+      },
+      "title": "Sections",
+      "type": "array"
+    }
+  },
+  "title": "processor.v1.canonical",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/processor/v1/canonical.json"
+}

@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "ProcessingProfile": {
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/process_request.ProfileStep"
+          },
+          "maxItems": 16,
+          "title": "Steps",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "enum": [
+              "canonical_json",
+              "lyrics_text",
+              "lyrics_html",
+              "chord_chart_html"
+            ],
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Outputs",
+          "type": "array"
+        }
+      },
+      "title": "ProcessingProfile",
+      "type": "object"
+    },
+    "ProfileStep": {
+      "properties": {
+        "type": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Type",
+          "type": "string"
+        },
+        "config": {
+          "additionalProperties": true,
+          "title": "Config",
+          "type": "object"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ProfileStep",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "source_text": {
+      "maxLength": 1000000,
+      "minLength": 1,
+      "title": "Source Text",
+      "type": "string"
+    },
+    "profile": {
+      "$ref": "#/$defs/process_request.ProcessingProfile"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    },
+    "artist": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artist"
+    }
+  },
+  "required": [
+    "source_text",
+    "profile"
+  ],
+  "title": "processor.v1.process_request",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/processor/v1/process_request.json"
+}
