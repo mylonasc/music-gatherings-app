@@ -1,0 +1,21 @@
+[project]
+name = "music-gatherings-backend"
+version = "0.1.0"
+description = "Music Gatherings FastAPI backend (S01 foundation)"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
