@@ -2,11 +2,12 @@
 
 ## Current state and source of truth
 
-This repository starts as a planning-only project. Do not assume implementation,
-test commands, packages, or deployment assets already exist. Read
-`EPIC_APP_BOOTSTRAP.md` before implementing work; it defines the architecture,
-stable S01–S16 slices, acceptance criteria, and dependency graph. Consult the linked
-GitHub parent/slice issues for current status and decisions.
+S01 is implemented on `main`: FastAPI backend skeleton (`backend/`), React
+skeleton (`frontend/`), Compose network/volume (`docker-compose.yml`), CI
+(`.github/workflows/ci.yml`), and docs. Later slices are still plans. Read
+`EPIC_APP_BOOTSTRAP.md` for the architecture, stable S01–S16 slices, acceptance
+criteria, and dependency graph. Consult the linked GitHub parent/slice issues
+for current status and decisions.
 
 Implement only the requested scope and respect slice prerequisites. Do not silently
 turn working defaults or unsupported provider capabilities into confirmed promises.
@@ -64,6 +65,12 @@ unless the task authorizes it. Preserve unrelated user changes.
 - Run the commands actually defined by the implementation/tooling. Until those
   exist, do not invent commands or report tests as passing. Report what ran and any
   blockers honestly. Keep dependencies locked and document new configuration.
+- Verified S01 commands (run from repo root):
+  `python3 -m pytest backend/tests -q`, `python3 -m ruff check backend`,
+  `python3 -m mypy backend/app`, `npm ci --prefix frontend`,
+  `npm run typecheck --prefix frontend`, `npm run build --prefix frontend`,
+  `docker compose config --quiet`, `docker compose up --build`.
+  Use `make` targets or the `README.md` equivalents where convenient.
 
 ## Workflow and maintaining this file
 
