@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, verify_csrf
+from app.api.deps import get_current_user, get_db, get_store, verify_csrf
 from app.api.v1.schemas import (
     ArtifactOut,
     CrewTrackEntryOut,
@@ -42,6 +42,8 @@ from app.models import (
     User,
 )
 from app.models.library import PIANO_VALUES
+from app.search.index import reindex_track
+from app.storage.local import LocalObjectStore
 
 router = APIRouter()
 
@@ -124,6 +126,7 @@ def suggest_track(
     body: TrackSuggest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    store: LocalObjectStore = Depends(get_store),
     _csrf: None = Depends(verify_csrf),
 ) -> CrewTrackListItem:
     crew = crew_or_404(db, user, crew_id)
@@ -163,6 +166,7 @@ def suggest_track(
             entity_id=track.id,
         )
     )
+    reindex_track(db, store, track.id)
     return _list_item(db, entry, track, user)
 
 
@@ -406,6 +410,7 @@ def update_track(
     body: TrackPatch,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    store: LocalObjectStore = Depends(get_store),
     _csrf: None = Depends(verify_csrf),
 ) -> TrackDetail:
     track = visible_track(db, user, track_id)
@@ -439,6 +444,7 @@ def update_track(
             entity_id=track.id,
         )
     )
+    reindex_track(db, store, track.id)
     return get_track(track_id, db, user)
 
 

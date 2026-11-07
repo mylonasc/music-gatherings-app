@@ -6,6 +6,7 @@ from app.api.v1.artifacts import router as artifacts_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.crews import router as crews_router
 from app.api.v1.library import router as library_router
+from app.api.v1.search import router as search_router
 from app.core.config import get_settings
 from app.core.database import create_engine, create_session_factory
 from app.core.rate_limit import RateLimiter
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(access_requests_router, prefix="/api/v1", tags=["access"])
     app.include_router(crews_router, prefix="/api/v1", tags=["crews"])
     app.include_router(library_router, prefix="/api/v1", tags=["library"])
+    app.include_router(search_router, prefix="/api/v1", tags=["search"])
     app.include_router(artifacts_router, prefix="/api/v1", tags=["artifacts"])
     return app
 

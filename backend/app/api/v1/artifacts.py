@@ -11,6 +11,7 @@ from app.api.v1.visibility import visible_track
 from app.core.config import Settings
 from app.models import Artifact, AuditEvent, SourceRecord, TrackVersion, User
 from app.models.provenance import ARTIFACT_KINDS
+from app.search.index import reindex_track
 from app.storage.local import LocalObjectStore, ObjectTooLargeError
 
 router = APIRouter()
@@ -135,6 +136,7 @@ def upload_artifact(
             entity_id=artifact.id,
         )
     )
+    reindex_track(db, store, version.track_id)
     return _artifact_out(artifact)
 
 
