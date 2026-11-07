@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     data_dir: str = "/data"
     database_url: str = "sqlite:////data/database/app.sqlite3"
     max_object_bytes: int = 50 * 1024 * 1024
+    session_ttl_seconds: int = 7 * 24 * 3600
+    session_cookie_name: str = "mg_session"
+    session_cookie_secure: bool = False
+    login_max_attempts: int = 10
+    login_window_seconds: int = 300
+    request_access_max_attempts: int = 10
+    request_access_window_seconds: int = 3600
     log_level: str = "INFO"
 
 

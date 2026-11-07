@@ -15,6 +15,7 @@ from app.models.provenance import (
     ProcessingProfile,
     SourceRecord,
 )
+from app.models.session import AuthSession
 
 __all__ = [
     "Base",
@@ -22,6 +23,7 @@ __all__ = [
     "Artifact",
     "ArtifactDerivation",
     "AuditEvent",
+    "AuthSession",
     "Crew",
     "CrewMembership",
     "CrewTrack",
