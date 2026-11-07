@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     worker_max_retries: int = 3
     online_provider_urls: dict[str, str] = {
         "fake": "http://ingestion-fake:8001",
-        "genius": "http://ingestion-genius:8002",
+        "lrclib": "http://ingestion-lrclib:8002",
         "ultimate_guitar": "http://ingestion-ultimate-guitar:8003",
     }
     processor_url: str = "http://processor:8004"

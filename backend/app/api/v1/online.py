@@ -19,7 +19,7 @@ from app.models import Artifact, ArtifactDerivation, SourceRecord, TrackVersion,
 
 router = APIRouter()
 
-PROVIDER_NAMES = ("fake", "genius", "ultimate_guitar")
+PROVIDER_NAMES = ("fake", "lrclib", "ultimate_guitar")
 ARTIFACT_TYPES = ("lyrics", "chord_chart", "tablature", "sheet_music")
 
 CONTEXT_KINDS: dict[str, list[str]] = {

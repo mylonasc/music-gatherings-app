@@ -177,14 +177,20 @@ def handle_online_import(ctx: JobContext) -> dict[str, Any]:
         provider=provider,
         external_id=external_id,
         source_url=source_url,
-        attribution=f"via {provider}",
+        attribution=(
+            "; ".join(dict.fromkeys(
+                str(item["attribution"])[:1000]
+                for item in fetched.get("artifacts", [])
+                if item.get("attribution")
+            ))[:2000] or f"via {provider}"
+        ),
         storage_permission="unknown",
         created_by_id=payload.get("created_by_id"),
     )
     db.add(source)
     db.flush()
 
-    warnings: list[str] = []
+    warnings: list[str] = [str(w)[:1000] for w in fetched.get("warnings", [])[:20]]
     created_ids: list[str] = []
     stored_texts: list[tuple[str, str]] = []  # (artifact_id, text)
     requested = list(payload.get("artifact_types") or [])
@@ -236,6 +242,11 @@ def handle_online_import(ctx: JobContext) -> dict[str, Any]:
             byte_size=stored.size,
             sha256=stored.sha256,
             object_key=stored.key,
+            file_name=(
+                "lyrics.lrc" if item.get("mime_type") == "application/x-lrc"
+                else "lyrics.txt" if kind == "lyrics" and item.get("mime_type") == "text/plain"
+                else None
+            ),
             created_by_id=payload.get("created_by_id"),
         )
         db.add(artifact)
@@ -248,7 +259,7 @@ def handle_online_import(ctx: JobContext) -> dict[str, Any]:
                 warnings.append(f"{kind} is not UTF-8 text; skipped for processing")
 
     if not created_ids and source_url:
-        # Providers like Genius return metadata only: keep an explicit reference.
+        # Metadata-only and instrumental results still keep an explicit reference.
         kind = requested[0] if requested else "lyrics"
         artifact = Artifact(
             track_version_id=version.id,

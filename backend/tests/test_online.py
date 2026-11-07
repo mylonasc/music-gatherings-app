@@ -51,12 +51,12 @@ FAKE_FETCH = {
     "warnings": [],
 }
 
-GENIUS_FETCH = {
-    "provider": "genius",
+LRCLIB_REFERENCE = {
+    "provider": "lrclib",
     "external_id": "111",
     "title": "Blue Test",
     "artist": "Tester",
-    "source_url": "https://genius.com/Tester-blue-test-lyrics",
+    "source_url": "https://lrclib.net/api/get/111",
     "artifacts": [],
     "warnings": ["reference-only"],
 }
@@ -204,12 +204,12 @@ def test_import_is_idempotent(tmp_path, monkeypatch):  # type: ignore[no-untyped
         assert len(db.execute(select(Artifact)).scalars().all()) == count_before
 
 
-def test_genius_import_is_reference_only(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
+def test_lrclib_import_can_be_reference_only(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
     app, client, csrf, crew_id = make_env(tmp_path, monkeypatch)
-    install_transports(monkeypatch, fetch_payload=GENIUS_FETCH, providers=("genius",))
+    install_transports(monkeypatch, fetch_payload=LRCLIB_REFERENCE, providers=("lrclib",))
     started = client.post(
         "/api/v1/imports",
-        json={"provider": "genius", "external_id": "111", "crew_id": crew_id},
+        json={"provider": "lrclib", "external_id": "111", "crew_id": crew_id},
         headers={"X-CSRF-Token": csrf},
     )
     assert started.status_code == 202
@@ -225,6 +225,58 @@ def test_genius_import_is_reference_only(tmp_path, monkeypatch):  # type: ignore
         client.get(f"/api/v1/artifacts/{result['artifact_ids'][0]}/content").status_code
         == 404
     )
+
+
+def test_lrclib_import_preserves_lyrics_lrc_attribution_and_visibility(tmp_path, monkeypatch):
+    from tests.test_library import setup_two_users
+
+    app, client, csrf, member, mcsrf, _crew = setup_two_users(tmp_path, monkeypatch)
+    private_crew = client.post(
+        "/api/v1/crews", json={"name": "Private"}, headers={"X-CSRF-Token": csrf}
+    ).json()["id"]
+    plain = "Original fixture lyric\n<em>inert</em>\n"
+    lrc = "[00:01.00] Original fixture lyric\n"
+    payload = {
+        **LRCLIB_REFERENCE,
+        "warnings": [],
+        "artifacts": [
+            {"artifact_type": "lyrics", "mime_type": mime, "content_text": text,
+             "storage_allowed": True, "attribution": "Lyrics via LRCLIB"}
+            for mime, text in (("text/plain", plain), ("application/x-lrc", lrc))
+        ],
+    }
+    install_transports(monkeypatch, fetch_payload=payload, providers=("lrclib",))
+    request = {"provider": "lrclib", "external_id": "111", "crew_id": private_crew}
+    denied = member.post("/api/v1/imports", json=request, headers={"X-CSRF-Token": mcsrf})
+    assert denied.status_code == 404
+    started = client.post("/api/v1/imports", json=request, headers={"X-CSRF-Token": csrf})
+    assert started.status_code == 202
+    status, result = run_job(app, started.json()["id"])
+    assert status == "succeeded" and len(result["artifact_ids"]) == 2
+    with factory_session(app) as db:
+        source = db.execute(select(SourceRecord)).scalar_one()
+        assert source.provider == "lrclib" and source.attribution == "Lyrics via LRCLIB"
+        assert source.storage_permission == "allowed"
+        assert source.source_url == "https://lrclib.net/api/get/111"
+    for artifact_id, expected in zip(result["artifact_ids"], (plain, lrc), strict=True):
+        content = client.get(f"/api/v1/artifacts/{artifact_id}/content")
+        assert content.status_code == 200 and content.content.decode() == expected
+        assert member.get(f"/api/v1/artifacts/{artifact_id}/content").status_code == 404
+    reps = client.get(f"/api/v1/tracks/{result['track_id']}/representations").json()
+    assert {item["artifact"]["file_name"] for item in reps["items"]} == {
+        "lyrics.txt", "lyrics.lrc",
+    }
+    assert client.get("/api/v1/search/local", params={"q": "fixture lyric"}).json()["total"] == 1
+    assert member.get("/api/v1/search/local", params={"q": "fixture lyric"}).json()["total"] == 0
+    # Re-import must not duplicate either raw representation.
+    again = client.post("/api/v1/imports", json=request, headers={"X-CSRF-Token": csrf})
+    status, reused = run_job(app, again.json()["id"])
+    assert status == "succeeded" and reused["artifact_ids"] == result["artifact_ids"]
+    # Retired Genius must not silently resolve to LRCLIB IDs.
+    retired = client.post(
+        "/api/v1/imports", json={**request, "provider": "genius"}, headers={"X-CSRF-Token": csrf}
+    )
+    assert retired.status_code == 422
 
 
 def test_import_with_profile_derives_and_caches(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]

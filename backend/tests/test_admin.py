@@ -99,7 +99,7 @@ def test_provider_status_and_isolated_search(tmp_path, monkeypatch):  # type: ig
         {"items": [{"provider": "fake", "external_id": "fake-song-1"}], "provider": "fake"},
     )
     statuses = admin_client.get("/api/v1/admin/providers").json()
-    assert {s["provider"] for s in statuses} >= {"fake", "genius", "ultimate_guitar"}
+    assert {s["provider"] for s in statuses} >= {"fake", "lrclib", "ultimate_guitar"}
     fake_status = next(s for s in statuses if s["provider"] == "fake")
     assert fake_status["reachable"] is True
 

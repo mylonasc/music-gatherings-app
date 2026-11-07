@@ -28,7 +28,7 @@ from app.models import AuditEvent, Job, ProcessingProfile, User
 
 router = APIRouter()
 
-ADMIN_PROVIDERS = ("fake", "genius", "ultimate_guitar")
+ADMIN_PROVIDERS = ("fake", "lrclib", "ultimate_guitar")
 
 
 class ProviderStatus(BaseModel):
