@@ -1,19 +1,21 @@
-import sqlite3
+from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
+from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.core.database import create_engine, session_scope
+from app.core.database import create_engine, create_session_factory, session_scope
 from app.models import Base
 
 
 @pytest.fixture()
-def db_file(tmp_path):  # type: ignore[no-untyped-def]
+def db_file(tmp_path: Path) -> Path:
     return tmp_path / "test.db"
 
 
 @pytest.fixture()
-def engine(db_file):  # type: ignore[no-untyped-def]
+def engine(db_file: Path) -> Iterator[Engine]:
     engine = create_engine(f"sqlite:///{db_file}")
     Base.metadata.create_all(engine)
     try:
@@ -23,21 +25,23 @@ def engine(db_file):  # type: ignore[no-untyped-def]
 
 
 @pytest.fixture()
-def session_factory(engine) -> sessionmaker[Session]:  # type: ignore[no-untyped-def]
-    from app.core.database import create_session_factory
-
+def session_factory(engine: Engine) -> sessionmaker[Session]:
     return create_session_factory(engine)
 
 
 @pytest.fixture()
-def db_session(session_factory):  # type: ignore[no-untyped-def]
+def db_session(session_factory: sessionmaker[Session]) -> Iterator[Session]:
     with session_scope(session_factory) as session:
         yield session
 
 
-def sqlite_pragma(db_file: object, name: str) -> object:
+def sqlite_pragma(db_file: Path, name: str) -> object:
+    import sqlite3
+
     con = sqlite3.connect(str(db_file))
     try:
-        return con.execute(f"PRAGMA {name}").fetchone()[0]
+        row = con.execute(f"PRAGMA {name}").fetchone()
+        assert row is not None
+        return row[0]
     finally:
         con.close()

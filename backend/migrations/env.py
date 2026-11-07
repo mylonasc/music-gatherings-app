@@ -4,6 +4,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
+from app.core.database import register_sqlite_pragmas
 from app.models import Base
 
 config = context.config
@@ -31,6 +32,8 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+    if connectable.dialect.name == "sqlite":
+        register_sqlite_pragmas(connectable)
     with connectable.connect() as connection:
         context.configure(
             connection=connection,

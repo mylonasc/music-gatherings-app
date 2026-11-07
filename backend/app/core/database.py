@@ -16,11 +16,11 @@ from sqlalchemy.orm import Session, sessionmaker
 def create_engine(database_url: str) -> Engine:
     engine = _create_engine(database_url, future=True)
     if engine.dialect.name == "sqlite":
-        _register_sqlite_pragmas(engine)
+        register_sqlite_pragmas(engine)
     return engine
 
 
-def _register_sqlite_pragmas(engine: Engine) -> None:
+def register_sqlite_pragmas(engine: Engine) -> None:
     @event.listens_for(engine, "connect")
     def _set_pragmas(dbapi_connection, _connection_record):  # type: ignore[no-untyped-def]
         cursor = dbapi_connection.cursor()

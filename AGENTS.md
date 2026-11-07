@@ -71,6 +71,9 @@ unless the task authorizes it. Preserve unrelated user changes.
   `npm run typecheck --prefix frontend`, `npm run build --prefix frontend`,
   `docker compose config --quiet`, `docker compose up --build`.
   Use `make` targets or the `README.md` equivalents where convenient.
+- S02 commands: run `alembic upgrade head` from `backend/` with
+  `MUSIC_GATHERINGS_DATABASE_URL` set (the container entrypoint does this
+  automatically before starting the API).
 
 ## Workflow and maintaining this file
 

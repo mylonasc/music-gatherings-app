@@ -46,7 +46,13 @@ docker compose up --build
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
-Data persists in the named `app-data` volume (`/data` in containers).
+Data persists in the named `app-data` volume (`/data` in containers):
+
+```text
+/data/database/app.sqlite3   SQLite (WAL mode, created by entrypoint migrations)
+/data/objects/<shard>/<id>   immutable artifact bytes
+/data/staging/               transient fragments, reconciled on maintenance
+```
 
 ```bash
 docker compose down        # keep data
