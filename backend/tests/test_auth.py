@@ -70,8 +70,9 @@ def test_full_access_flow(tmp_path, monkeypatch):  # type: ignore[no-untyped-def
     user_csrf = login(user_client, "mia", "s3cret-long")
     me = user_client.get("/api/v1/auth/me")
     assert me.status_code == 200
-    assert me.json()["username"] == "mia"
-    assert me.json()["is_admin"] is False
+    assert me.json()["user"]["username"] == "mia"
+    assert me.json()["user"]["is_admin"] is False
+    assert me.json()["csrf_token"] == user_csrf
     done = user_client.post("/api/v1/auth/logout", headers={"X-CSRF-Token": user_csrf})
     assert done.status_code == 204
     assert user_client.get("/api/v1/auth/me").status_code == 401

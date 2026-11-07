@@ -4,13 +4,14 @@ import { expectNoPageOverflow, expectNoSeriousA11yViolations, expectTouchTargets
 test.use({ storageState: ".auth/member.json" });
 
 test("seeded tracks render with metadata on the default route", async ({ page }) => {
-  const seed = loadSeed();
   await page.goto("/");
-  await expect(page.getByText(seed.trackTitle)).toBeVisible();
+  const card = page.locator(".track-card", { hasText: "Blue Test Engine" });
+  await expect(card.getByText("Blue Test Engine — The Determinists")).toBeVisible();
+  await expect(card.getByText("Test")).toBeVisible();
+  await expect(card.getByText("Votes 1")).toBeVisible();
+  await expect(card.getByRole("button", { name: "+1" })).toHaveAttribute("aria-pressed", "true");
+  await expect(card.getByText(/piano-friendly/)).toBeVisible();
   await expect(page.getByText("Untitled track")).toBeVisible();
-  await expect(page.getByText("The Determinists")).toBeVisible();
-  await expect(page.getByText(/you voted \+1/)).toBeVisible();
-  await expect(page.getByText(/piano-friendly/)).toBeVisible();
   await expectNoPageOverflow(page);
 });
 

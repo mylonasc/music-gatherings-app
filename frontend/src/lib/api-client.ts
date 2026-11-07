@@ -76,6 +76,17 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
 export const get = <T>(path: string, signal?: AbortSignal): Promise<T> =>
   api<T>(path, { signal });
 
+export async function getText(path: string, signal?: AbortSignal): Promise<string> {
+  const response = await fetch(path, { credentials: "include", signal });
+  if (response.status === 401) {
+    setCsrfToken(null);
+  }
+  if (!response.ok) {
+    throw new ApiError(response.status, `Request failed (${response.status})`);
+  }
+  return response.text();
+}
+
 export const post = <T>(path: string, body?: unknown): Promise<T> =>
   api<T>(path, { method: "POST", body });
 

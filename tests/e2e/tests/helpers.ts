@@ -8,6 +8,7 @@ export interface Seed {
   defaultCrewId: string;
   trackId: string;
   trackTitle: string;
+  renderedTrackId: string;
   hiddenTrackId: string;
 }
 

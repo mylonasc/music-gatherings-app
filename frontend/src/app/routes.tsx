@@ -2,6 +2,7 @@ import { Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router
 import { useAuth } from "../features/auth/AuthContext";
 import { LoginPage, RequestAccessPage } from "../features/auth/AuthPages";
 import { CrewPage } from "../features/crew/CrewPage";
+import { OnlineSearchPage } from "../features/search/OnlineSearchPage";
 import { TrackDetailPage } from "../features/tracks/TrackDetailPage";
 import { TracksPage } from "../features/tracks/TracksPage";
 
@@ -29,6 +30,9 @@ function Shell() {
           <ul>
             <li>
               <Link to="/">Jam tracks</Link>
+            </li>
+            <li>
+              <Link to="/search">Online search</Link>
             </li>
             <li>
               <Link to="/crew">Crew</Link>
@@ -65,6 +69,7 @@ export function AppRoutes() {
         <Route element={<Shell />}>
           <Route index element={<TracksPage />} />
           <Route path="tracks/:trackId" element={<TrackDetailPage />} />
+          <Route path="search" element={<OnlineSearchPage />} />
           <Route path="crew" element={<CrewPage />} />
         </Route>
       </Route>

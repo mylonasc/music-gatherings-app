@@ -83,7 +83,9 @@ describe("jam tracks page", () => {
     });
     expect(await screen.findByText("Blue Test Train — The Determinists")).toBeInTheDocument();
     expect(screen.getByText("Untitled track")).toBeInTheDocument();
-    expect(screen.getByText(/you voted \+1/)).toBeInTheDocument();
+    expect(screen.getByText("Votes 3")).toBeInTheDocument();
+    const plusOnes = screen.getAllByRole("button", { name: "+1" });
+    expect(plusOnes[0]).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/piano-friendly/)).toBeInTheDocument();
   });
 

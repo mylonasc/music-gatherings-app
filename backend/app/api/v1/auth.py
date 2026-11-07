@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.api.deps import (
     check_rate_limit,
     get_current_session,
-    get_current_user,
     get_db,
     get_settings,
     verify_csrf,
@@ -88,6 +87,9 @@ def logout(
     response.delete_cookie(key=settings.session_cookie_name, path="/")
 
 
-@router.get("/auth/me", response_model=UserOut)
-def me(user: User = Depends(get_current_user)) -> UserOut:
-    return _user_out(user)
+@router.get("/auth/me", response_model=LoginResponse)
+def me(
+    session_user: tuple[AuthSession, User] = Depends(get_current_session),
+) -> LoginResponse:
+    row, user = session_user
+    return LoginResponse(csrf_token=row.csrf_token, user=_user_out(user))

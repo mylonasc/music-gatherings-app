@@ -322,7 +322,7 @@ def test_job_authorization(tmp_path, monkeypatch):  # type: ignore[no-untyped-de
     stray = TestClient(app)
     stray_csrf = login(stray, "stray", "s3cret-long")
     # A user who belongs only to the other crew cannot see it.
-    stray_me = stray.get("/api/v1/auth/me").json()
+    stray_me = stray.get("/api/v1/auth/me").json()["user"]
     removed = admin_client.delete(
         f"/api/v1/crews/{crew_id}/members/{stray_me['id']}",
         headers={"X-CSRF-Token": csrf},

@@ -19,8 +19,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    get<UserOut>("/api/v1/auth/me", controller.signal)
-      .then(setUser)
+    get<LoginResponse>("/api/v1/auth/me", controller.signal)
+      .then((response) => {
+        setCsrfToken(response.csrf_token);
+        setUser(response.user);
+      })
       .catch((err: unknown) => {
         if (!(err instanceof DOMException)) setUser(null);
       })

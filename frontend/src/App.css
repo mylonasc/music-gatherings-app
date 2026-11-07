@@ -74,11 +74,19 @@ body {
   gap: 0.25rem;
 }
 
-.field input {
+.field input,
+.field select,
+.field textarea {
   min-height: var(--min-touch);
   font-size: 1rem;
   padding: 0.5rem;
   width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .field-error {
@@ -120,4 +128,24 @@ button {
 
 .track-card dd {
   margin: 0;
+}
+
+/* Music documents keep alignment and scroll inside their own region. */
+.doc-panel {
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  max-width: 100%;
+}
+
+.doc-panel .chord-chart,
+.doc-panel pre {
+  font-family: ui-monospace, monospace;
+  white-space: pre;
+}
+
+.doc-panel .chord-line {
+  color: #1a3a8f;
+  font-weight: 600;
 }

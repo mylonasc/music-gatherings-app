@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ApiError, get } from "./api-client";
+import { ApiError, get, getText } from "./api-client";
 
 export interface UseGetResult<T> {
   data: T | null;
@@ -50,4 +50,33 @@ export function useGet<T>(path: string | null): UseGetResult<T> {
   }, [path, nonce]);
 
   return { data, error, loading, status, reload };
+}
+
+/** Fetch raw text (rendered documents), with the same conventions as useGet. */
+export function useText(path: string | null) {
+  const [data, setData] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(path !== null);
+
+  useEffect(() => {
+    if (path === null) {
+      setLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    getText(path, controller.signal)
+      .then(setData)
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setError(err instanceof Error ? err.message : "Request failed");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [path]);
+
+  return { data, error, loading };
 }

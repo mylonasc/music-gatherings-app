@@ -92,7 +92,7 @@ async function suggest(crewId, track, cookie, csrf) {
 const seeded = await suggest(
   defaultCrew.id,
   {
-    title: "Blue Test Train",
+    title: "Blue Test Engine",
     artist: "The Determinists",
     description: "Seeded track for Playwright.",
     genres: ["Test"],
@@ -145,6 +145,35 @@ await api(`/api/v1/crews/${defaultCrew.id}/tracks/${seeded.crew_track_id}/vote`,
   body: { value: 1 },
 });
 
+// Import the fake provider item with a processing profile so the detail view
+// has rendered HTML documents (mobile scroll-containment coverage).
+const importJob = (
+  await api("/api/v1/imports", {
+    method: "POST",
+    cookie: adminCookie,
+    csrf: adminCsrf,
+    body: {
+      provider: "fake",
+      external_id: "fake-song-1",
+      crew_id: defaultCrew.id,
+      profile: {
+        schema_version: 1,
+        steps: [{ type: "normalize_sections", config: {} }],
+        outputs: ["canonical_json", "lyrics_html", "chord_chart_html"],
+      },
+    },
+  })
+).json;
+let importState = "queued";
+for (let attempt = 0; attempt < 30 && (importState === "queued" || importState === "running"); attempt++) {
+  await new Promise((r) => setTimeout(r, 2000));
+  importState = (await api(`/api/v1/jobs/${importJob.id}`, { cookie: adminCookie })).json.status;
+}
+if (importState !== "succeeded") throw new Error(`seed import stuck at ${importState}`);
+const renderedTrackId = (
+  await api(`/api/v1/jobs/${importJob.id}`, { cookie: adminCookie })
+).json.result.track_id;
+
 writeFileSync(
   new URL("./.seed.json", import.meta.url),
   JSON.stringify(
@@ -155,7 +184,8 @@ writeFileSync(
       },
       defaultCrewId: defaultCrew.id,
       trackId: seeded.track_id,
-      trackTitle: "Blue Test Train",
+      trackTitle: "Blue Test Engine",
+      renderedTrackId,
       hiddenTrackId: hidden.track_id,
     },
     null,
