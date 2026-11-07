@@ -65,6 +65,37 @@ jobs:
       - run: docker build ./backend
       - run: docker build ./frontend
 
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+      - run: npm ci --prefix tests/e2e
+      - run: npx playwright install --with-deps chromium webkit
+        working-directory: tests/e2e
+      - run: docker compose up -d --build
+      - name: Seed E2E data
+        run: |
+          docker compose exec -T -e MUSIC_GATHERINGS_BOOTSTRAP_PASSWORD="${E2E_ADMIN_PASSWORD}" backend python -m app.cli create-admin --username root
+          SEED_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD}" npm run --prefix tests/e2e seed
+        env:
+          E2E_ADMIN_PASSWORD: e2e-admin-ci-pass-1
+      - run: npx playwright test
+        working-directory: tests/e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results
+          path: |
+            tests/e2e/test-results/
+            tests/e2e/playwright-report/
+      - run: docker compose down -v
+        if: always()
+
   secrets:
     runs-on: ubuntu-latest
     steps:

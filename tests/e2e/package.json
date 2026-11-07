@@ -1,0 +1,18 @@
+{
+  "name": "music-gatherings-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "seed": "node seed.mjs",
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium-desktop --project=chromium-mobile"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.57.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
