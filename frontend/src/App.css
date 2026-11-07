@@ -38,6 +38,22 @@ body {
   margin: 0 0 0.25rem;
 }
 
+.app-header nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+}
+
+.app-header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-touch);
+  padding: 0.25rem 0.75rem;
+}
+
 .app-main section {
   border: 1px solid #ddd;
   border-radius: 0.5rem;
@@ -45,7 +61,63 @@ body {
   margin-top: 1rem;
 }
 
-.app-main li,
-.app-main p {
+.app-main form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 28rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field input {
   min-height: var(--min-touch);
+  font-size: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.field-error {
+  color: #8a1f1f;
+  margin: 0;
+}
+
+button {
+  min-height: var(--min-touch);
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  align-self: flex-start;
+}
+
+.track-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.track-card {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.track-card dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0.5rem 0 0;
+}
+
+.track-card dt {
+  font-weight: 600;
+}
+
+.track-card dd {
+  margin: 0;
 }
