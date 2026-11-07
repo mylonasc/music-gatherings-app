@@ -4,6 +4,8 @@ All state transitions use short transactions; the worker never holds a write
 transaction across handler execution (proven by test_no_write_txn_during_run).
 """
 
+import hashlib
+import json
 import time
 import traceback
 import uuid
@@ -69,6 +71,10 @@ def create_job(
     idempotency_key: str | None = None,
 ) -> tuple[Job, bool]:
     """Create a queued job. Returns (job, created); duplicates return the original."""
+    if idempotency_key:
+        # Never let a caller retrieve another user's job by guessing their key.
+        scope = json.dumps([created_by_id, crew_id, kind, idempotency_key])
+        idempotency_key = hashlib.sha256(scope.encode()).hexdigest()
     if idempotency_key:
         existing = db.execute(
             select(Job).where(Job.idempotency_key == idempotency_key)

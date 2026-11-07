@@ -1,3 +1,6 @@
+from typing import Self
+
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,6 +33,12 @@ class Settings(BaseSettings):
     request_access_max_attempts: int = 10
     request_access_window_seconds: int = 3600
     log_level: str = "INFO"
+
+    @model_validator(mode="after")
+    def production_cookies(self) -> Self:
+        if self.app_env == "production":
+            self.session_cookie_secure = True
+        return self
 
 
 def get_settings() -> Settings:

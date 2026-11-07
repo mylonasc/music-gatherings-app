@@ -1,6 +1,7 @@
 """Artifact upload, external references, metadata, and protected serving."""
 
 import os
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Response, UploadFile, status
 from sqlalchemy.orm import Session
@@ -90,7 +91,7 @@ def upload_artifact(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="unsupported file type"
         )
-    data = file.file.read()
+    data = file.file.read(settings.max_object_bytes + 1)
     if len(data) > settings.max_object_bytes:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="file too large"
@@ -227,7 +228,7 @@ def get_artifact_content(
         media_type=artifact.mime_type,
         headers={
             # Never serve user uploads inline: prevents stored HTML/SVG/JS execution.
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote(filename, safe='')}",
             "X-Content-Type-Options": "nosniff",
         },
     )

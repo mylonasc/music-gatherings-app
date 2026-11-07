@@ -78,6 +78,10 @@ def create_job_endpoint(
     user: User = Depends(get_current_user),
     _csrf: None = Depends(verify_csrf),
 ) -> JobOut:
+    if body.kind.startswith("online."):
+        raise HTTPException(
+            status_code=422, detail="use /search/online or /imports for online jobs"
+        )
     kind = get_kind(body.kind)
     if kind is None:
         raise HTTPException(
