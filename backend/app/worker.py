@@ -12,6 +12,7 @@ import time
 from app.core.config import get_settings
 from app.core.database import create_engine, create_session_factory, session_scope
 from app.jobs.handlers import register_builtin_kinds
+from app.jobs.online import register_online_kinds
 from app.jobs.service import claim_next_available, new_worker_id, run_claimed_job
 from app.models import Job
 from app.storage.local import LocalObjectStore
@@ -49,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     settings = get_settings()
     register_builtin_kinds()
+    register_online_kinds()
     worker_id = new_worker_id()
     stop = False
 
