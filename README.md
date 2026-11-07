@@ -56,6 +56,16 @@ Then: users `POST /api/v1/access-requests`, admins approve in
 automatically), and log in via `POST /api/v1/auth/login`, which sets an
 HttpOnly session cookie and returns a CSRF token for mutating requests.
 
+Library API (all crew-scoped, CSRF-protected writes):
+
+- `POST /api/v1/crews/{id}/tracks` suggest, `GET` list with
+  `genre`/`piano_suggested`/`limit`/`offset`, vote totals included
+- `PUT/DELETE .../tracks/{entry}/vote`, `PATCH/DELETE` entries (requester/admin)
+- `GET/PATCH /api/v1/tracks/{id}`, `GET/POST .../versions`
+- `POST .../versions/{id}/artifacts/upload` (txt/pdf/png/jpg, size-capped),
+  `POST .../artifacts/reference` (link-only), `GET /api/v1/artifacts/{id}[/content]`
+  (stored bytes served as `attachment` with `nosniff`)
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
