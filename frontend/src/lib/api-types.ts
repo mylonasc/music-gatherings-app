@@ -158,6 +158,47 @@ export interface OnlineSearchRequest {
   crew_id: string;
 }
 
+export interface ProcessPreviewRequest {
+  source_text: string;
+  profile: Record<string, unknown>;
+}
+
+export interface ProfileCreate {
+  name: string;
+  steps?: Record<string, unknown>[];
+  outputs?: string[];
+}
+
+export interface ProfileOut {
+  id: string;
+  name: string;
+  version: number;
+  config: Record<string, unknown>;
+  is_active: boolean;
+}
+
+export interface ProviderStatus {
+  provider: string;
+  reachable: boolean;
+  configured?: boolean | null;
+  supports_search?: boolean;
+  supports_fetch?: boolean;
+  allows_storage?: boolean;
+  limiter?: Record<string, unknown>;
+  upstream_requests?: number | null;
+  error?: string | null;
+}
+
+export interface ProviderTestFetch {
+  provider: string;
+  external_id: string;
+}
+
+export interface ProviderTestSearch {
+  provider: string;
+  query: string;
+}
+
 export interface RepresentationItem {
   artifact: ArtifactOut;
   source_provider?: string | null;

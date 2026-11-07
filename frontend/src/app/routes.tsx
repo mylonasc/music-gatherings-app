@@ -1,6 +1,7 @@
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import { LoginPage, RequestAccessPage } from "../features/auth/AuthPages";
+import { AdminPage } from "../features/admin/AdminPage";
 import { CrewPage } from "../features/crew/CrewPage";
 import { OnlineSearchPage } from "../features/search/OnlineSearchPage";
 import { TrackDetailPage } from "../features/tracks/TrackDetailPage";
@@ -37,6 +38,11 @@ function Shell() {
             <li>
               <Link to="/crew">Crew</Link>
             </li>
+            {user?.is_admin && (
+              <li>
+                <Link to="/admin">Admin</Link>
+              </li>
+            )}
           </ul>
         </nav>
         {user && (
@@ -71,6 +77,7 @@ export function AppRoutes() {
           <Route path="tracks/:trackId" element={<TrackDetailPage />} />
           <Route path="search" element={<OnlineSearchPage />} />
           <Route path="crew" element={<CrewPage />} />
+          <Route path="admin" element={<AdminPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
