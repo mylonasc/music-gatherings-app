@@ -32,6 +32,11 @@ Working defaults (not previously confirmed product decisions):
 
 ## 2. User experience: mobile first
 
+The replacement UI is specified and sliced in `EPIC_UI_IMRPOVEMENTS.md` (#27).
+Its implementation keeps these product/authorization boundaries and adds typed
+viewer/method seams, safe HTML sanitation, identity-keyed state, and a six-device
+visual-review suite. Extension recipes live in `frontend/README.md`.
+
 The default authenticated route is the **jam track view**: the crew's shared list
 of suggested tracks. Also provide **jam crew**, **track search**, **track detail**,
 and **administration/testing** views.

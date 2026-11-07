@@ -1,21 +1,23 @@
-import type { ReactNode } from "react";
+import { cloneElement, isValidElement } from "react";
+import type { ReactNode, ReactElement } from "react";
 
 export function Page({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section aria-labelledby="page-title">
-      <h2 id="page-title">{title}</h2>
+    <section className="page" aria-labelledby="page-title">
+      <header className="page-heading"><p className="eyebrow">Your next great session</p>
+      <h2 id="page-title" tabIndex={-1}>{title}</h2></header>
       {children}
     </section>
   );
 }
 
 export function Loading({ label = "Loading…" }: { label?: string }) {
-  return <p role="status">{label}</p>;
+  return <p className="feedback loading" role="status"><span className="status-dot" aria-hidden="true" />{label}</p>;
 }
 
 export function ErrorNotice({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <p role="alert">
+    <p className="feedback error-notice" role="alert">
       {message}{" "}
       {onRetry && (
         <button type="button" onClick={onRetry}>
@@ -24,6 +26,14 @@ export function ErrorNotice({ message, onRetry }: { message: string; onRetry?: (
       )}
     </p>
   );
+}
+
+export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
+  return <div className="empty-state" role="status"><strong>{title}</strong>{children && <p>{children}</p>}</div>;
+}
+
+export function Badge({ children }: { children: ReactNode }) {
+  return <span className="badge">{children}</span>;
 }
 
 export function Field({
@@ -40,7 +50,10 @@ export function Field({
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      {children}
+      {isValidElement(children) ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+        "aria-invalid": error ? true : undefined,
+        "aria-describedby": [children.props && (children.props as Record<string, unknown>)["aria-describedby"], error ? `${id}-error` : null].filter(Boolean).join(" ") || undefined,
+      }) : children}
       {error && (
         <p className="field-error" role="alert" id={`${id}-error`}>
           {error}

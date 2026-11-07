@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { expectNoPageOverflow, loadSeed } from "./helpers";
+import { expectNoPageOverflow } from "./helpers";
 
 test.use({ storageState: ".auth/member.json" });
 
@@ -20,15 +20,13 @@ test("online search finds the fake provider hit and imports it", async ({ page }
   await expectNoPageOverflow(page);
 });
 
-test("disabled provider fails loudly without touching the library", async ({ page }) => {
+test("disabled provider is explicitly unavailable and cannot start discovery", async ({ page }) => {
   await page.goto("/search");
   await page.getByLabel("Song or artist").fill("blue");
-  // Only Ultimate Guitar: honestly disabled, must surface a job failure.
+  // Capabilities are queried privately; no live upstream search is involved.
   await page.getByLabel("fake", { exact: false }).uncheck();
-  await page.getByLabel("ultimate guitar", { exact: false }).check();
+  await expect(page.getByLabel("ultimate guitar", { exact: false })).toBeDisabled();
   const searchButton = page.getByRole("button", { name: "Search online" });
-  await searchButton.click();
-  await expect(page.getByRole("alert")).toContainText(/provider|unavailable|failed/i, {
-    timeout: 30_000,
-  });
+  await expect(searchButton).toBeDisabled();
+  await expect(page.getByText("Unavailable for discovery")).toBeVisible();
 });

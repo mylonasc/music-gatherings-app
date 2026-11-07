@@ -108,6 +108,8 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    env:
+      E2E_LOGIN_MAX_ATTEMPTS: 100 # Expanded isolated device matrix, not production.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -116,8 +118,6 @@ jobs:
           cache: npm
           cache-dependency-path: tests/e2e/package-lock.json
       - run: npm ci --prefix tests/e2e
-      - run: npx playwright install --with-deps chromium webkit
-        working-directory: tests/e2e
       - run: docker compose up -d --build --wait --wait-timeout 180
       - name: Seed E2E data
         run: |
@@ -125,15 +125,25 @@ jobs:
           SEED_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD}" npm run --prefix tests/e2e seed
         env:
           E2E_ADMIN_PASSWORD: e2e-admin-ci-pass-1
-      - run: npx playwright test
-        working-directory: tests/e2e
+      - name: Browser journeys in pinned Playwright environment
+        run: docker run --rm --network host --ipc=host -e CI=true -v "$PWD/tests/e2e:/work" -w /work mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd npx playwright test
       - uses: actions/upload-artifact@v4
-        if: failure()
+        id: ui-evidence
+        if: always()
         with:
-          name: playwright-results
+          name: ui-review-${{ github.sha }}
+          retention-days: 14
           path: |
             tests/e2e/test-results/
             tests/e2e/playwright-report/
+            tests/e2e/review-gallery/
+      - name: Link visual review evidence
+        if: always()
+        env:
+          ARTIFACT_URL: ${{ steps.ui-evidence.outputs.artifact-url }}
+        run: |
+          echo "## Mobile UI review" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Download screenshots, gallery and Playwright report]($ARTIFACT_URL) (14-day retention). Open review-gallery/index.html or playwright-report/index.html after extraction." >> "$GITHUB_STEP_SUMMARY"
       - name: Stack diagnostics on failure
         if: failure()
         run: |

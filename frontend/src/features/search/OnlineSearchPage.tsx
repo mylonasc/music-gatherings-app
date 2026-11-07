@@ -1,205 +1,56 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { ApiError, post } from "../../lib/api-client";
-import type { JobOut } from "../../lib/api-types";
+import { post } from "../../lib/api-client";
+import type { JobOut, ProviderOption } from "../../lib/api-types";
 import { useGet } from "../../lib/use-api";
 import { useJob } from "../../lib/use-job";
-import { ErrorNotice, Field, Page } from "../../components/ui";
-
-const PROVIDERS = ["fake", "lrclib", "ultimate_guitar"] as const;
-
-interface SearchHit {
-  provider: string;
-  external_id: string;
-  title: string | null;
-  artist: string | null;
-  artifact_types: string[];
-  source_url: string | null;
-  attribution: string | null;
-  warnings?: string[];
-}
+import { EmptyState, ErrorNotice, Field, Loading, Page } from "../../components/ui";
+import { SearchResultCard } from "./SearchResultCard";
+import type { SearchHit } from "./types";
 
 export function OnlineSearchPage() {
-  const { data: crews } = useGet<{ id: string; name: string }[]>("/api/v1/crews");
-  const crewId = crews && crews.length > 0 ? crews[0].id : null;
-  const [query, setQuery] = useState("");
-  const [providers, setProviders] = useState<string[]>(["fake"]);
-  const [searchJobId, setSearchJobId] = useState<string | null>(null);
-  const [importJobs, setImportJobs] = useState<Record<string, string>>({});
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [starting, setStarting] = useState(false);
-
-  const { job: searchJob, error: searchJobError } = useJob(searchJobId);
-
-  async function startSearch(event: FormEvent) {
-    event.preventDefault();
-    if (!crewId || !query.trim() || providers.length === 0) return;
-    setStarting(true);
-    setSubmitError(null);
-    setSearchJobId(null);
-    try {
-      const job = await post<JobOut>("/api/v1/search/online", {
-        query: query.trim(),
-        providers,
-        crew_id: crewId,
-      });
-      setSearchJobId(job.id);
-    } catch (err: unknown) {
-      setSubmitError(err instanceof ApiError ? err.message : "Search failed to start.");
-    } finally {
-      setStarting(false);
-    }
-  }
-
-  async function importHit(hit: SearchHit) {
-    if (!crewId) return;
-    try {
-      const job = await post<JobOut>("/api/v1/imports", {
-        provider: hit.provider,
-        external_id: hit.external_id,
-        crew_id: crewId,
-      });
-      setImportJobs((prev) => ({ ...prev, [`${hit.provider}:${hit.external_id}`]: job.id }));
-    } catch (err: unknown) {
-      setSubmitError(err instanceof ApiError ? err.message : "Import failed to start.");
-    }
-  }
-
-  const results: SearchHit[] =
-    searchJob?.status === "succeeded"
-      ? Object.entries((searchJob.result as { results?: Record<string, SearchHit[]> })?.results ?? {}).flatMap(
-          ([provider, items]) => items.map((item) => ({ ...item, provider })),
-        )
-      : [];
-
-  function displayHit(hit: SearchHit): string {
-    if (hit.title && hit.artist) return `${hit.title} — ${hit.artist}`;
-    return hit.title ?? "Untitled";
-  }
-
-  return (
-    <Page title="Online search">
-      <p>
-        Discovery only: searching never changes your library. Importing is a separate,
-        explicit step.
-      </p>
-      {crewId === null && <p role="status">Join a crew before searching online.</p>}
-      <form onSubmit={startSearch} aria-label="Online provider search">
-        {submitError && <ErrorNotice message={submitError} />}
-        <Field id="online-query" label="Song or artist">
-          <input
-            id="online-query"
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Blue Train"
-          />
-        </Field>
-        <fieldset>
-          <legend>Providers</legend>
-          {PROVIDERS.map((provider) => (
-            <label key={provider} htmlFor={`provider-${provider}`}>
-              <input
-                id={`provider-${provider}`}
-                type="checkbox"
-                checked={providers.includes(provider)}
-                onChange={(e) =>
-                  setProviders((prev) =>
-                    e.target.checked ? [...prev, provider] : prev.filter((p) => p !== provider),
-                  )
-                }
-              />{" "}
-              {provider === "lrclib" ? "LRCLIB" : provider.replaceAll("_", " ")}
-            </label>
-          ))}
-        </fieldset>
-        <button type="submit" disabled={starting || !crewId}>
-          {starting ? "Starting…" : "Search online"}
-        </button>
-      </form>
-
-      {searchJob && searchJob.status !== "succeeded" && searchJob.status !== "failed" && (
-        <p role="status">
-          Searching… {Math.round(searchJob.progress * 100)}%
-          {searchJob.wait_reason ? ` (${searchJob.wait_reason})` : ""}
-        </p>
-      )}
-      {searchJobError && <ErrorNotice message={searchJobError} />}
-      {searchJob?.status === "failed" && (
-        <ErrorNotice message={`Search failed: ${searchJob.error ?? "unknown error"}`} />
-      )}
-      {searchJob?.status === "succeeded" && results.length === 0 && (
-        <p role="status">No provider results. Try different words or providers.</p>
-      )}
-      {results.length > 0 && (
-        <ul className="track-list">
-          {results.map((hit) => (
-            <li key={`${hit.provider}:${hit.external_id}`} className="track-card">
-              <strong>{displayHit(hit)}</strong>
-              <p>
-                <small>
-                  via {hit.provider}
-                  {hit.attribution ? ` · ${hit.attribution}` : ""}
-                </small>
-              </p>
-              {hit.source_url && (
-                <p>
-                  <a href={hit.source_url} target="_blank" rel="noreferrer">
-                    source page
-                  </a>
-                </p>
-              )}
-              {(hit.warnings ?? []).map((warning, index) => <p key={index}>{warning}</p>)}
-              <ImportControl
-                hit={hit}
-                jobId={importJobs[`${hit.provider}:${hit.external_id}`] ?? null}
-                onImport={() => void importHit(hit)}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
-    </Page>
-  );
+  const { data: crews, error: crewsError } = useGet<{ id: string; name: string }[]>("/api/v1/crews");
+  const crewId = crews?.[0]?.id;
+  return <Page title="Online search"><p>Find your next favourite. Discovery never changes your library; importing is a separate, explicit step.</p>
+    {crewsError && <ErrorNotice message={crewsError} />}
+    {crews && !crewId && <EmptyState title="Join a crew before searching online." />}
+    {crewId && <Discovery key={crewId} crewId={crewId} />}
+  </Page>;
 }
 
-function ImportControl({
-  hit,
-  jobId,
-  onImport,
-}: {
-  hit: SearchHit;
-  jobId: string | null;
-  onImport: () => void;
-}) {
-  const { job } = useJob(jobId);
-  if (!jobId) {
-    return (
-      <button type="button" onClick={onImport}>
-        Import “{hit.title ?? hit.external_id}” to the library
-      </button>
-    );
+function Discovery({ crewId }: { crewId: string }) {
+  const { data: options, loading, error, reload } = useGet<ProviderOption[]>("/api/v1/providers");
+  const [query, setQuery] = useState("");
+  const [providers, setProviders] = useState<string[]>(["fake"]);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const lock = useRef(false);
+  const { job, error: jobError } = useJob(jobId);
+  async function search(event: FormEvent) {
+    event.preventDefault();
+    const selected = providers.filter((id) => options?.some((p) => p.provider === id && p.available && p.supports_search));
+    if (lock.current || !query.trim() || !selected.length) return;
+    lock.current = true; setStarting(true); setSubmitError(null); setJobId(null);
+    try { const started = await post<JobOut>("/api/v1/search/online", { crew_id: crewId, query: query.trim(), providers: selected }); setJobId(started.id); }
+    catch (err) { setSubmitError(err instanceof Error ? err.message : "Search failed to start."); }
+    finally { lock.current = false; setStarting(false); }
   }
-  if (!job || (job.status !== "succeeded" && job.status !== "failed")) {
-    return (
-      <p role="status">
-        Importing… {job ? `${Math.round(job.progress * 100)}%` : ""}
-        {job?.wait_reason ? ` (${job.wait_reason})` : ""}
-      </p>
-    );
-  }
-  if (job.status === "failed") {
-    return <ErrorNotice message={`Import failed: ${job.error ?? "unknown error"}`} />;
-  }
-  const trackId = (job.result as { track_id?: string } | null)?.track_id;
-  const reused = (job.result as { reused?: boolean } | null)?.reused;
-  const warnings = (job.result as { warnings?: string[] } | null)?.warnings ?? [];
-  return (
-    <div role="status">
-      Imported{reused ? " (already in the library)" : ""}.{" "}
-      {trackId && <Link to={`/tracks/${trackId}`}>Open the track</Link>}
-      {warnings.map((warning, index) => <p key={index}>{warning}</p>)}
-    </div>
-  );
+  const results = job?.status === "succeeded" ? Object.entries((job.result as { results?: Record<string, SearchHit[]> })?.results ?? {}).flatMap(([provider, hits]) => hits.map((hit) => ({ ...hit, provider }))) : [];
+  return <>
+    {loading && <Loading label="Loading providers…" />}{error && <ErrorNotice message={error} onRetry={reload} />}
+    <form onSubmit={search} aria-label="Online provider search" className="surface-panel">
+      {submitError && <ErrorNotice message={submitError} />}
+      <Field id="online-query" label="Song or artist"><input id="online-query" type="search" maxLength={200} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Title or artist" /></Field>
+      <fieldset><legend>Providers</legend>{options?.map((p) => <div key={p.provider}>
+        <label htmlFor={`provider-${p.provider}`}><input id={`provider-${p.provider}`} type="checkbox" disabled={!p.available || !p.supports_search} checked={providers.includes(p.provider)} onChange={(e) => setProviders((prev) => e.target.checked ? [...prev, p.provider] : prev.filter((id) => id !== p.provider))} />{p.provider === "lrclib" ? "LRCLIB" : p.provider.replaceAll("_", " ")}</label>
+        <small className="provider-note">{!p.available || !p.supports_search ? "Unavailable for discovery" : p.storage_note || (p.allows_storage ? "Local imports supported" : "Reference-only")}</small>
+      </div>)}</fieldset>
+      <button type="submit" disabled={starting || loading || !query.trim() || !providers.some((id) => options?.some((p) => p.provider === id && p.available && p.supports_search))}>{starting ? "Starting…" : "Search online"}</button>
+    </form>
+    {(jobError || job?.status === "failed" || job?.status === "cancelled") && <ErrorNotice message={jobError ?? `Search ${job?.status}: ${job?.error ?? "No results"}`} />}
+    {job && !["succeeded", "failed", "cancelled"].includes(job.status) && <p className="feedback" role="status">Searching… {Math.round(job.progress * 100)}% {job.wait_reason}</p>}
+    {job?.status === "succeeded" && !results.length && <EmptyState title="No provider results.">Try different words or providers.</EmptyState>}
+    {!!results.length && <ul className="track-list">{results.map((hit) => <SearchResultCard key={`${crewId}:${hit.provider}:${hit.external_id}`} hit={hit} crewId={crewId} />)}</ul>}
+  </>;
 }

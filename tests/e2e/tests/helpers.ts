@@ -55,7 +55,7 @@ export async function expectNoSeriousA11yViolations(page: Page): Promise<void> {
   const results = await new AxeBuilder({ page }).analyze();
   const blocking = results.violations.filter((v) => v.impact === "critical" || v.impact === "serious");
   expect(
-    blocking.map((v) => `${v.id}: ${v.description}`),
+    blocking.map((v) => `${v.id}: ${v.description}\n${v.nodes.map((n) => `${n.target.join(", ")}: ${n.failureSummary}`).join("\n")}`),
     "no critical/serious a11y violations",
   ).toEqual([]);
 }

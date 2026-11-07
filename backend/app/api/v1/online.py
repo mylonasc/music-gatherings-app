@@ -3,6 +3,7 @@ context-specific representations. Search never mutates the library."""
 
 from typing import Any, Literal
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -13,14 +14,59 @@ from app.api.v1.jobs import JobOut, _job_out
 from app.api.v1.schemas import ArtifactOut
 from app.api.v1.visibility import crew_or_404, visible_track
 from app.core.config import Settings
+from app.core.providers import PROVIDER_NAMES
 from app.core.quotas import QuotaExceeded
+from app.jobs.online import provider_client
 from app.jobs.service import create_job
 from app.models import Artifact, ArtifactDerivation, SourceRecord, TrackVersion, User
 
 router = APIRouter()
 
-PROVIDER_NAMES = ("fake", "lrclib", "ultimate_guitar")
 ARTIFACT_TYPES = ("lyrics", "chord_chart", "tablature", "sheet_music")
+
+
+class ProviderOption(BaseModel):
+    provider: str
+    supports_search: bool = False
+    supports_fetch: bool = False
+    allows_storage: bool = False
+    artifact_types: list[str] = Field(default_factory=list)
+    storage_note: str = ""
+    available: bool = False
+
+
+@router.get("/providers", response_model=list[ProviderOption])
+def discovery_providers(
+    user: User = Depends(get_current_user),
+    settings: Settings = Depends(get_settings),
+) -> list[ProviderOption]:
+    """Read only private capability metadata; never initiate provider search/fetch."""
+    options: list[ProviderOption] = []
+    for name in PROVIDER_NAMES:
+        option = ProviderOption(provider=name)
+        if name not in settings.online_provider_urls:
+            options.append(option)
+            continue
+        try:
+            with provider_client(name, settings) as client:
+                response = client.get("/v1/capabilities", timeout=2.0)
+            response.raise_for_status()
+            caps = response.json()
+            if isinstance(caps, dict):
+                option = ProviderOption(
+                    provider=name, available=True,
+                    supports_search=caps.get("supports_search") is True,
+                    supports_fetch=caps.get("supports_fetch") is True,
+                    allows_storage=caps.get("allows_storage") is True,
+                    artifact_types=[
+                        k for k in caps.get("artifact_types", []) if k in ARTIFACT_TYPES
+                    ],
+                    storage_note=str(caps.get("storage_note", ""))[:1000],
+                )
+        except (httpx.HTTPError, ValueError, TypeError):
+            pass  # Do not expose internal service URLs or exception diagnostics.
+        options.append(option)
+    return options
 
 CONTEXT_KINDS: dict[str, list[str]] = {
     "audience": ["lyrics", "rendered_lyrics"],

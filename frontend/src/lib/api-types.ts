@@ -25,6 +25,11 @@ export interface ArtifactOut {
   language: string | null;
 }
 
+export interface ArtifactReadArgs {
+  artifact_id: string;
+  max_chars?: number;
+}
+
 export interface ArtifactReferenceIn {
   kind: string;
   external_url: string;
@@ -37,6 +42,10 @@ export interface Body_upload_artifact_api_v1_tracks__track_id__versions__version
   file: string;
   kind: string;
   language?: string | null;
+}
+
+export interface CompareArgs {
+  track_id: string;
 }
 
 export interface CrewCreate {
@@ -177,6 +186,16 @@ export interface ProfileOut {
   is_active: boolean;
 }
 
+export interface ProviderOption {
+  provider: string;
+  supports_search?: boolean;
+  supports_fetch?: boolean;
+  allows_storage?: boolean;
+  artifact_types?: string[];
+  storage_note?: string;
+  available?: boolean;
+}
+
 export interface ProviderStatus {
   provider: string;
   reachable: boolean;
@@ -213,6 +232,11 @@ export interface RepresentationResponse {
   items?: RepresentationItem[];
 }
 
+export interface SearchArgs {
+  query: string;
+  limit?: number;
+}
+
 export interface SearchHitOut {
   track_id: string;
   title: string | null;
@@ -228,6 +252,41 @@ export interface SearchResponse {
   total?: number;
   limit?: number;
   offset?: number;
+}
+
+export interface SummaryArgs {
+  limit?: number;
+}
+
+export interface TokenCreate {
+  name: string;
+  crew_id: string;
+  capabilities?: string[];
+  expires_in_days?: number | null;
+}
+
+export interface TokenCreated {
+  id: string;
+  name: string;
+  crew_id: string;
+  capabilities: string[];
+  token: string;
+  expires_at: string | null;
+}
+
+export interface TokenOut {
+  id: string;
+  name: string;
+  crew_id: string;
+  capabilities: string[];
+  created_at: string;
+  expires_at: string | null;
+  revoked_at: string | null;
+  last_used_at: string | null;
+}
+
+export interface TrackArgs {
+  track_id: string;
 }
 
 export interface TrackDetail {
