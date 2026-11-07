@@ -7,7 +7,7 @@ const TERMINAL = new Set(["succeeded", "failed", "cancelled"]);
 /** Poll a durable job until it reaches a terminal state. */
 export function useJob(jobId: string | null, intervalMs = 2000) {
   const [job, setJob] = useState<JobOut | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<{ id: string; message: string } | null>(null);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -22,13 +22,13 @@ export function useJob(jobId: string | null, intervalMs = 2000) {
         const current = await get<JobOut>(`/api/v1/jobs/${jobId}`, controller.signal);
         if (cancelled) return;
         setJob(current);
-        setError(null);
+        setFailure(null);
         if (!TERMINAL.has(current.status)) {
           timer.current = window.setTimeout(poll, intervalMs);
         }
       } catch (err: unknown) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Job lookup failed.");
+        setFailure({ id: jobId!, message: err instanceof Error ? err.message : "Job lookup failed." });
       }
     }
     poll();
@@ -39,5 +39,5 @@ export function useJob(jobId: string | null, intervalMs = 2000) {
     };
   }, [jobId, intervalMs]);
 
-  return { job, error };
+  return { job: job?.id === jobId ? job : null, error: failure?.id === jobId ? failure.message : null };
 }

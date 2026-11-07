@@ -11,6 +11,7 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 const demoUser = { id: "u1", username: "mia", display_name: null, is_admin: false };
+const providers = ["fake", "lrclib"].map((provider) => ({ provider, available: true, supports_search: true, supports_fetch: true, allows_storage: true, artifact_types: ["lyrics"], storage_note: "Personal use" }));
 
 function installSearchFetch() {
   const calls: string[] = [];
@@ -20,6 +21,7 @@ function installSearchFetch() {
       calls.push(`${init?.method ?? "GET"} ${url}`);
       if (url === "/api/v1/auth/me") return jsonResponse(200, demoUser);
       if (url === "/api/v1/crews") return jsonResponse(200, [{ id: "c1", name: "Jam Crew" }]);
+      if (url === "/api/v1/providers") return jsonResponse(200, providers);
       if (url === "/api/v1/search/online")
         return jsonResponse(202, { id: "job-s1", kind: "online.search", status: "queued", progress: 0 });
       if (url === "/api/v1/jobs/job-s1")
@@ -85,7 +87,7 @@ describe("online search page", () => {
     const searchButton = await screen.findByRole("button", { name: "Search online" });
     await waitFor(() => expect(searchButton).toBeEnabled());
     await user.click(searchButton);
-    expect(await screen.findByText(/Blue Test Train/, { selector: "strong" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /Blue Test Train/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Import “Blue Test Train”/ }));
     await waitFor(() => expect(screen.getByRole("link", { name: "Open the track" })).toBeInTheDocument());
   });
@@ -97,6 +99,7 @@ describe("online search page", () => {
       vi.fn(async (url: string) => {
         if (url === "/api/v1/auth/me") return jsonResponse(200, demoUser);
         if (url === "/api/v1/crews") return jsonResponse(200, [{ id: "c1", name: "Jam Crew" }]);
+        if (url === "/api/v1/providers") return jsonResponse(200, providers);
         if (url === "/api/v1/search/online")
           return jsonResponse(202, { id: "job-bad", kind: "online.search", status: "queued", progress: 0 });
         return jsonResponse(200, {
