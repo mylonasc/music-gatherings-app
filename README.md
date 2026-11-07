@@ -66,6 +66,10 @@ Library API (all crew-scoped, CSRF-protected writes):
   `POST .../artifacts/reference` (link-only), `GET /api/v1/artifacts/{id}[/content]`
   (stored bytes served as `attachment` with `nosniff`)
 
+Local search: `GET /api/v1/search/local?q=...&genre=&piano_suggested=&limit=&offset=`
+(FTS5 prefix matching over title/artist/genres/lyrics plus typo-tolerant
+fallback; per-crew notes are never indexed, results are crew-scoped).
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
