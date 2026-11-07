@@ -129,9 +129,15 @@ docker compose down -v     # delete data volume (destructive)
 backend/            FastAPI app, config, tests, Dockerfile
 frontend/           React + TypeScript + Vite, Dockerfile + nginx
   src/app/          routes and shell
-  src/features/     auth, tracks, crew views (+ colocated vitest suites)
-  src/lib/          typed API client, generated api-types, useGet hook
+  src/features/     auth, tracks, search, crew views (+ colocated vitest suites)
+  src/lib/          typed API client, generated api-types, useGet/useJob hooks
   scripts/          gen-api-types.mjs (regenerate from live backend OpenAPI)
+
+Jam-track workflows: suggest tracks with metadata, vote (+1/−1/clear), genre
+and piano filters, local library search with lyric snippets, online provider
+search with job progress and explicit import, version lists, artifact
+downloads, and audience/guitar/piano representation tabs with scroll-contained
+notation panels. Playwright journeys cover all of these (`tests/e2e`).
 contracts/          Versioned service contracts (S07 ingestion, S09 processor)
 services/ingestion/ Provider adapters (S07 common/fake, S08 genius/UG)
 services/processor/ Normalization/post-processing (S09)
