@@ -172,7 +172,7 @@ export function ProcessorPreview() {
                 role="region"
                 aria-label={`preview ${name}`}
                 tabIndex={0}
-                dangerouslySetInnerHTML={{ __html: html }}
+                dangerouslySetInnerHTML={{ __html: sanitizeMusicHtml(html) }}
               />
             </section>
           ))}
@@ -181,3 +181,4 @@ export function ProcessorPreview() {
     </section>
   );
 }
+import { sanitizeMusicHtml } from "../../lib/music-html";

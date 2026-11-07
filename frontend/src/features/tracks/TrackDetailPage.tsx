@@ -1,7 +1,8 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { ErrorNotice, Loading, Page } from "../../components/ui";
-import { useGet, useText } from "../../lib/use-api";
+import { useGet } from "../../lib/use-api";
+import { DocumentViewer } from "./viewers/DocumentViewer";
 import type { ArtifactOut, RepresentationResponse, TrackDetail, VersionDetailOut } from "../../lib/api-types";
 
 function artifactLabel(kind: string): string {
@@ -53,7 +54,7 @@ export function TrackDetailPage() {
       ))}
       <h3>Versions and materials</h3>
       {data.versions.length === 0 && <p role="status">No versions yet.</p>}
-      {trackId && <Representations trackId={trackId} />}
+      {trackId && <Representations key={trackId} trackId={trackId} />}
       {data.versions.map((version: VersionDetailOut) => (
         <section key={version.id} aria-label={version.label ?? "Version"}>
           <h4>{version.label ?? "Version"}</h4>
@@ -137,54 +138,11 @@ function Representations({ trackId }: { trackId: string }) {
                   <small>Note: {warning}</small>
                 </p>
               ))}
-              <DocPanel artifact={item.artifact} />
+              <DocumentViewer artifact={item.artifact} />
             </li>
           ))}
         </ul>
       )}
     </section>
-  );
-}
-
-function DocPanel({ artifact }: { artifact: ArtifactOut }) {
-  const isText = artifact.mime_type === "text/plain" || artifact.mime_type === "application/x-lrc";
-  const { data, error, loading } = useText(
-    artifact.is_external || (!isText && artifact.mime_type !== "text/html")
-      ? null
-      : `/api/v1/artifacts/${artifact.id}/content`,
-  );
-  if (artifact.is_external && artifact.external_url) {
-    return (
-      <p>
-        <a href={artifact.external_url} target="_blank" rel="noreferrer">
-          open external reference
-        </a>
-      </p>
-    );
-  }
-  if (!isText && artifact.mime_type !== "text/html") {
-    return null;
-  }
-  if (loading) return <Loading label="Loading document…" />;
-  if (error || data === null) return <ErrorNotice message={error ?? "Document unavailable."} />;
-  if (isText) {
-    return (
-      <pre className="doc-panel" role="region" aria-label={`${artifactLabel(artifact.kind)} document`} tabIndex={0}>
-        {data}
-      </pre>
-    );
-  }
-  // The HTML is rendered by our own processor with escaping; it is never
-  // raw provider content. The panel scrolls internally on narrow screens and
-  // is keyboard-focusable so scrollable content stays operable (axe:
-  // scrollable-region-focusable).
-  return (
-    <div
-      className="doc-panel"
-      role="region"
-      aria-label={`${artifactLabel(artifact.kind)} document`}
-      tabIndex={0}
-      dangerouslySetInnerHTML={{ __html: data }}
-    />
   );
 }
