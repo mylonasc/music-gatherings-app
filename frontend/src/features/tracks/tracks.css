@@ -1,0 +1,13 @@
+.library-intro { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 1rem; }
+.library-intro h3 { margin: 0; }
+.library-intro p { color: var(--muted); max-width: 38rem; }
+.library-intro .badge { background: var(--gold-soft); color: var(--gold); }
+.track-card-heading { display: flex; align-items: center; gap: .9rem; }
+.track-card-heading > div { min-width: 0; }
+.track-card-heading a { text-decoration: none; font-size: 1.05rem; }
+.song-mark { flex-shrink: 0; display: grid; place-items: center; width: 2.8rem; height: 3.3rem; border-radius: .6rem; background: var(--gold-soft); color: var(--gold); font-size: 1.5rem; }
+.material-badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-block: 1rem; }
+.votes { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: .9rem; }
+.votes > span:first-child { margin-right: auto; font-size: .85rem; font-weight: 650; }
+.votes button { padding: .4rem .65rem; min-width: 44px; }
+@media (min-width: 75rem) { .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

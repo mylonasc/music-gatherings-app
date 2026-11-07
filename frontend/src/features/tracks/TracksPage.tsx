@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ErrorNotice, Loading, Page } from "../../components/ui";
+import { EmptyState, ErrorNotice, Loading, Page } from "../../components/ui";
 import { useGet } from "../../lib/use-api";
 import { sanitizeSnippet } from "../../lib/snippet";
-import type { CrewTrackList, CrewTrackListItem, SearchResponse } from "../../lib/api-types";
+import type { CrewTrackList, SearchResponse } from "../../lib/api-types";
 import { useAuth } from "../auth/AuthContext";
 import { SuggestTrackForm } from "./SuggestTrackForm";
-import { VoteButtons } from "./VoteButtons";
-
-function displayTitle(title: string | null, artist: string | null): string {
-  if (title && artist) return `${title} — ${artist}`;
-  return title ?? artist ?? "Untitled track";
-}
+import { TrackCard, displayTitle } from "./TrackCard";
+import "./tracks.css";
 
 export function TracksPage() {
   const { user } = useAuth();
@@ -34,8 +30,6 @@ export function TracksPage() {
     reload,
   } = useGet<CrewTrackList>(crewId ? `/api/v1/crews/${crewId}/tracks?${listParams}` : null);
 
-  const [items, setItems] = useState<CrewTrackListItem[] | null>(null);
-  const shown = items ?? tracks?.items ?? [];
   const {
     data: searchResults,
     error: searchError,
@@ -46,18 +40,11 @@ export function TracksPage() {
       : null,
   );
 
-  function updateVote(crewTrackId: string, score: number, myVote: number | null) {
-    setItems((prev) => {
-      const base = prev ?? tracks?.items ?? [];
-      return base.map((item) =>
-        item.crew_track_id === crewTrackId ? { ...item, vote_score: score, my_vote: myVote } : item,
-      );
-    });
-  }
-
   return (
     <Page title="Jam tracks">
-      {user && <p>Signed in as {user.username}.</p>}
+      <div className="library-intro"><div><h3>The soundtrack to your next gathering.</h3>
+      <p>Find a favourite, cast your vote, or bring something new to the crew.</p></div>
+      {user && <span className="badge">{crews?.[0]?.name ?? user.username}</span>}</div>
       {crewsLoading && <Loading label="Loading your crew…" />}
       {crewsError && <ErrorNotice message={crewsError} />}
       {!crewsLoading && !crewsError && crews?.length === 0 && (
@@ -70,7 +57,6 @@ export function TracksPage() {
             aria-label="Filter and search tracks"
             onSubmit={(e) => {
               e.preventDefault();
-              setItems(null);
               setSearchNonce((n) => n + 1);
               reload();
             }}
@@ -104,7 +90,6 @@ export function TracksPage() {
           <SuggestTrackForm
             crewId={crewId}
             onCreated={() => {
-              setItems(null);
               setSearchQuery("");
               reload();
             }}
@@ -143,51 +128,11 @@ export function TracksPage() {
         </section>
       )}
       {tracks && !searchQuery.trim() && tracks.items.length === 0 && (
-        <p role="status">No tracks yet. Suggest the first song for the next jam.</p>
+        <EmptyState title="No tracks yet.">Suggest the first song for the next jam.</EmptyState>
       )}
-      {tracks && !searchQuery.trim() && shown.length > 0 && (
-        <ul className="track-list">
-          {shown.map((item) => (
-            <li key={item.crew_track_id} className="track-card">
-              <Link to={`/tracks/${item.track_id}`}>
-                <strong>{displayTitle(item.title, item.artist)}</strong>
-              </Link>
-              <dl>
-                {item.requester && (
-                  <>
-                    <dt>Suggested by</dt>
-                    <dd>{item.requester}</dd>
-                  </>
-                )}
-                {item.genres.length > 0 && (
-                  <>
-                    <dt>Genres</dt>
-                    <dd>{item.genres.join(", ")}</dd>
-                  </>
-                )}
-                {item.artifact_kinds.length > 0 && (
-                  <>
-                    <dt>Available</dt>
-                    <dd>{item.artifact_kinds.join(", ").replaceAll("_", " ")}</dd>
-                  </>
-                )}
-              </dl>
-              {crewId && (
-                <VoteButtons
-                  crewId={crewId}
-                  crewTrackId={item.crew_track_id}
-                  score={item.vote_score}
-                  myVote={item.my_vote}
-                  onChanged={(score, myVote) => updateVote(item.crew_track_id, score, myVote)}
-                />
-              )}
-              {item.piano_suitability === "suggested" && (
-                <p>
-                  <small>piano-friendly</small>
-                </p>
-              )}
-            </li>
-          ))}
+      {tracks && crewId && !searchQuery.trim() && tracks.items.length > 0 && (
+        <ul className="track-list library-grid">
+          {tracks.items.map((item) => <TrackCard key={`${crewId}:${listParams}:${item.crew_track_id}`} item={item} crewId={crewId} />)}
         </ul>
       )}
     </Page>
