@@ -128,9 +128,13 @@ docker compose down -v     # delete data volume (destructive)
 ```text
 backend/            FastAPI app, config, tests, Dockerfile
 frontend/           React + TypeScript + Vite, Dockerfile + nginx
-contracts/          Versioned service contracts (populated from S07/S09)
-services/ingestion/ Provider adapters (from S07/S08)
-services/processor/ Normalization/post-processing (from S09)
+  src/app/          routes and shell
+  src/features/     auth, tracks, crew views (+ colocated vitest suites)
+  src/lib/          typed API client, generated api-types, useGet hook
+  scripts/          gen-api-types.mjs (regenerate from live backend OpenAPI)
+contracts/          Versioned service contracts (S07 ingestion, S09 processor)
+services/ingestion/ Provider adapters (S07 common/fake, S08 genius/UG)
+services/processor/ Normalization/post-processing (S09)
 tests/e2e/          Playwright flows (from S12)
 deploy/             Ops notes; Compose file lives at repo root
 ```
