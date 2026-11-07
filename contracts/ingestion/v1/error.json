@@ -1,0 +1,51 @@
+{
+  "$defs": {
+    "ErrorDetail": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "default": false,
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "retry_after_seconds": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retry After Seconds"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ErrorDetail",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "error": {
+      "$ref": "#/$defs/error.ErrorDetail"
+    }
+  },
+  "required": [
+    "error"
+  ],
+  "title": "ingestion.v1.error",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/error.json"
+}

@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "external_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "External Id",
+      "type": "string"
+    },
+    "artifact_types": {
+      "items": {
+        "enum": [
+          "lyrics",
+          "chord_chart",
+          "tablature",
+          "sheet_music"
+        ],
+        "type": "string"
+      },
+      "title": "Artifact Types",
+      "type": "array"
+    }
+  },
+  "required": [
+    "external_id"
+  ],
+  "title": "ingestion.v1.fetch_request",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/fetch_request.json"
+}

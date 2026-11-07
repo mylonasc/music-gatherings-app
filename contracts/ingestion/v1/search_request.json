@@ -1,0 +1,37 @@
+{
+  "properties": {
+    "query": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Query",
+      "type": "string"
+    },
+    "artifact_types": {
+      "items": {
+        "enum": [
+          "lyrics",
+          "chord_chart",
+          "tablature",
+          "sheet_music"
+        ],
+        "type": "string"
+      },
+      "title": "Artifact Types",
+      "type": "array"
+    },
+    "limit": {
+      "default": 10,
+      "maximum": 50,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "ingestion.v1.search_request",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/search_request.json"
+}

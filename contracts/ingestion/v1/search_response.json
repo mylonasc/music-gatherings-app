@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "SearchItem": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "external_id": {
+          "title": "External Id",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "artist": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artist"
+        },
+        "artifact_types": {
+          "items": {
+            "enum": [
+              "lyrics",
+              "chord_chart",
+              "tablature",
+              "sheet_music"
+            ],
+            "type": "string"
+          },
+          "title": "Artifact Types",
+          "type": "array"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        },
+        "attribution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attribution"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "provider",
+        "external_id"
+      ],
+      "title": "SearchItem",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/search_response.SearchItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "provider": {
+      "default": "",
+      "title": "Provider",
+      "type": "string"
+    }
+  },
+  "title": "ingestion.v1.search_response",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/search_response.json"
+}

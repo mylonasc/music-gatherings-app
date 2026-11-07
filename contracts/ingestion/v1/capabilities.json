@@ -1,0 +1,64 @@
+{
+  "properties": {
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "version": {
+      "default": "v1",
+      "title": "Version",
+      "type": "string"
+    },
+    "artifact_types": {
+      "items": {
+        "enum": [
+          "lyrics",
+          "chord_chart",
+          "tablature",
+          "sheet_music"
+        ],
+        "type": "string"
+      },
+      "title": "Artifact Types",
+      "type": "array"
+    },
+    "supports_search": {
+      "default": true,
+      "title": "Supports Search",
+      "type": "boolean"
+    },
+    "supports_fetch": {
+      "default": true,
+      "title": "Supports Fetch",
+      "type": "boolean"
+    },
+    "allows_storage": {
+      "default": false,
+      "title": "Allows Storage",
+      "type": "boolean"
+    },
+    "storage_note": {
+      "default": "",
+      "title": "Storage Note",
+      "type": "string"
+    },
+    "rate_limit_requests": {
+      "default": 0,
+      "title": "Rate Limit Requests",
+      "type": "integer"
+    },
+    "rate_limit_period_seconds": {
+      "default": 60.0,
+      "title": "Rate Limit Period Seconds",
+      "type": "number"
+    }
+  },
+  "required": [
+    "provider",
+    "artifact_types"
+  ],
+  "title": "ingestion.v1.capabilities",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/capabilities.json"
+}

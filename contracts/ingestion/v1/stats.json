@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "provider": {
+      "default": "",
+      "title": "Provider",
+      "type": "string"
+    },
+    "limiter": {
+      "additionalProperties": true,
+      "title": "Limiter",
+      "type": "object"
+    },
+    "cache": {
+      "additionalProperties": true,
+      "title": "Cache",
+      "type": "object"
+    },
+    "upstream_requests": {
+      "default": 0,
+      "title": "Upstream Requests",
+      "type": "integer"
+    },
+    "throttled_requests": {
+      "default": 0,
+      "title": "Throttled Requests",
+      "type": "integer"
+    }
+  },
+  "title": "ingestion.v1.stats",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/stats.json"
+}

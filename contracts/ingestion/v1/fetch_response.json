@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "FetchedArtifact": {
+      "properties": {
+        "artifact_type": {
+          "enum": [
+            "lyrics",
+            "chord_chart",
+            "tablature",
+            "sheet_music"
+          ],
+          "title": "Artifact Type",
+          "type": "string"
+        },
+        "mime_type": {
+          "title": "Mime Type",
+          "type": "string"
+        },
+        "content_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Text"
+        },
+        "content_base64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Base64"
+        },
+        "attribution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attribution"
+        },
+        "storage_allowed": {
+          "default": false,
+          "title": "Storage Allowed",
+          "type": "boolean"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifact_type",
+        "mime_type"
+      ],
+      "title": "FetchedArtifact",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "provider": {
+      "default": "",
+      "title": "Provider",
+      "type": "string"
+    },
+    "external_id": {
+      "default": "",
+      "title": "External Id",
+      "type": "string"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    },
+    "artist": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artist"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Url"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/fetch_response.FetchedArtifact"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "title": "ingestion.v1.fetch_response",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/ingestion/v1/fetch_response.json"
+}
