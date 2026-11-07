@@ -251,7 +251,11 @@ Local validation: **187 Playwright tests passed** in a fresh isolated run withou
 baseline updates; **31 frontend tests**, **95 backend tests**, frontend production
 build/typecheck, backend Ruff and mypy passed. Screenshot generation was a separate
 explicit review run, followed by normal comparison. Screenshots for all six
-projects were visually inspected. CI must still be checked for its exact SHA.
+projects were visually inspected. CI run
+[42409929628](https://github.com/mylonasc/music-gatherings-app/actions/runs/42409929628)
+passed all seven jobs at head `20c0609`, including 187 browser checks with no
+retries and a downloaded/verified 90-image gallery. PR #41 contains preview images
+and current check results; later commits require their own green checks.
 
 Optional maintainability follow-ups: #40 (`techdebt-ui-epic`), linked to parent
 #27. Remaining backend security/durability/recovery issues are not automatically
@@ -262,15 +266,18 @@ boundaries, beyond this frontend sanitation.
 
 Parent: #27.
 
-- [ ] UI-01: #28
-- [ ] UI-02: #29
-- [ ] UI-03: #30
-- [ ] UI-04: #31
-- [ ] UI-05: #32
-- [ ] UI-06: #33
-- [ ] UI-07: #34
-- [ ] UI-08: #35
-- [ ] UI-09: #36
-- [ ] UI-10: #37
-- [ ] UI-11: #38
-- [ ] UI-12: #39
+- [x] UI-01: #28
+- [x] UI-02: #29
+- [x] UI-03: #30
+- [x] UI-04: #31
+- [x] UI-05: #32
+- [x] UI-06: #33
+- [x] UI-07: #34
+- [x] UI-08: #35
+- [x] UI-09: #36
+- [x] UI-10: #37
+- [x] UI-11: #38
+- [x] UI-12: #39
+
+Checked means implemented and validated on the branch, not merged or physically
+device-certified. PR #41 closes these issues when merged. Optional debt #40 stays open.
