@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.api.health import router as health_router
 from app.api.v1.access_requests import router as access_requests_router
+from app.api.v1.admin import router as admin_router
 from app.api.v1.artifacts import router as artifacts_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.crews import router as crews_router
@@ -34,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router, tags=["health"])
     app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
     app.include_router(access_requests_router, prefix="/api/v1", tags=["access"])
+    app.include_router(admin_router, prefix="/api/v1", tags=["admin"])
     app.include_router(crews_router, prefix="/api/v1", tags=["crews"])
     app.include_router(jobs_router, prefix="/api/v1", tags=["jobs"])
     app.include_router(online_router, prefix="/api/v1", tags=["online"])
