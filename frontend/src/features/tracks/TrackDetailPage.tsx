@@ -166,11 +166,16 @@ function DocPanel({ artifact }: { artifact: ArtifactOut }) {
   }
   if (loading) return <Loading label="Loading document…" />;
   if (error || data === null) return <ErrorNotice message={error ?? "Document unavailable."} />;
+  // The HTML is rendered by our own processor with escaping; it is never
+  // raw provider content. The panel scrolls internally on narrow screens and
+  // is keyboard-focusable so scrollable content stays operable (axe:
+  // scrollable-region-focusable).
   return (
     <div
       className="doc-panel"
-      // The HTML is rendered by our own processor with escaping; it is never
-      // raw provider content. The panel scrolls internally on narrow screens.
+      role="region"
+      aria-label={`${artifactLabel(artifact.kind)} document`}
+      tabIndex={0}
       dangerouslySetInnerHTML={{ __html: data }}
     />
   );
