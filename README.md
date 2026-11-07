@@ -70,6 +70,12 @@ Local search: `GET /api/v1/search/local?q=...&genre=&piano_suggested=&limit=&off
 (FTS5 prefix matching over title/artist/genres/lyrics plus typo-tolerant
 fallback; per-crew notes are never indexed, results are crew-scoped).
 
+Background jobs: `POST /api/v1/jobs` (`maintenance.reindex`,
+`maintenance.reconcile_storage`, idempotent via `idempotency_key`),
+`GET /api/v1/jobs[/{id}]` (crew-scoped), `POST /api/v1/jobs/{id}/cancel`.
+The `worker` container claims and runs jobs with leases, bounded retries with
+backoff, and cooperative cancellation; it publishes no ports.
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
