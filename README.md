@@ -76,13 +76,20 @@ Background jobs: `POST /api/v1/jobs` (`maintenance.reindex`,
 The `worker` container claims and runs jobs with leases, bounded retries with
 backoff, and cooperative cancellation; it publishes no ports.
 
-Ingestion (S07): versioned v1 contracts in `contracts/ingestion/v1/`
+Ingestion (S07–S08): versioned v1 contracts in `contracts/ingestion/v1/`
 (generated from `services/ingestion/common/contracts.py`), per-service
 token-bucket rate limits (overall/search/fetch + spacing/concurrency +
 cooldowns + circuit breaker), a single limited HTTP client choke point,
 TTL caching with in-flight coalescing, per-user backend quotas, and a
 deterministic `ingestion-fake` provider on the private network
 (`http://ingestion-fake:8001`, no published ports).
+
+Providers (see `services/ingestion/PROVIDERS.md` for the capability/rights
+matrix): `ingestion-genius` uses only the official Genius API
+(`GENIUS_ACCESS_TOKEN`) for search/metadata — reference-only, never scraped,
+never stored; `ingestion-ultimate-guitar` is explicitly disabled (no public
+or licensed UG API exists; scraping would violate ToS/publisher rights) and
+returns structured 503s. Both publish no ports.
 
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
