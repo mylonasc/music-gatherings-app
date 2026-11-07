@@ -21,7 +21,7 @@ test("admin approves a pending request and the account works", async ({ page, re
   });
   expect(created.ok()).toBeTruthy();
   await page.goto("/admin");
-  await page.getByRole("button", { name: "Approve" }).first().click();
+  await page.locator("li", { hasText: username }).getByRole("button", { name: "Approve" }).click();
   await expect(page.getByRole("status").first()).toContainText(/approved/i);
   const login = await request.post("/api/v1/auth/login", {
     data: { username, password: "s3cret-long-pass" },

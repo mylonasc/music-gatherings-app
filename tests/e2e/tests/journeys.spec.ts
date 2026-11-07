@@ -36,6 +36,7 @@ test("voting updates the score", async ({ page }) => {
 test("genre filter narrows the list", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Untitled track")).toBeVisible();
+  await page.getByText("Filters", { exact: true }).click();
   await page.getByLabel("Genre").fill("Test");
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page.getByText("Blue Test Engine")).toBeVisible();
@@ -58,9 +59,9 @@ test("track views switch audience, guitar, and piano representations", async ({ 
   await page.goto(`/tracks/${seed.renderedTrackId}`);
   await expect(page.getByText("Rolling down", { exact: false }).first()).toBeVisible();
   await page.getByLabel("guitar", { exact: true }).check();
-  await expect(page.getByText("chord chart", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("region", { name: "rendered chord chart document" }).first()).toBeVisible();
   await page.getByLabel("piano", { exact: true }).check();
-  await expect(page.getByText("chord chart", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("region", { name: "rendered chord chart document" }).first()).toBeVisible();
   await expectNoPageOverflow(page);
 });
 
@@ -72,7 +73,7 @@ test.describe("narrow viewport documents", () => {
     await page.goto(`/tracks/${seed.renderedTrackId}`);
     await page.getByLabel("guitar", { exact: true }).check();
     // Wait for the guitar rendering itself, not just any panel: the previous
-    // context's panel stays mounted until the new fetch resolves.
+   // context's panel must not leak into the new resource identity.
     await expect(page.locator(".doc-panel .chord-line").first()).toBeVisible();
     const panel = page.getByRole("region", { name: "rendered chord chart document" }).first();
     await expect(panel).toBeVisible();
@@ -85,7 +86,7 @@ test.describe("narrow viewport documents", () => {
     expect(containment.hasChords, "chord annotations preserved").toBeGreaterThan(0);
     expect(containment.panelScrolls, "wide notation scrolls inside its panel").toBe(true);
     await expectNoSeriousA11yViolations(page);
-    await expectTouchTargets(page, "main button, main input, main select, header nav a");
+    await expectTouchTargets(page, "main button, main input:visible, main select:visible, header nav a");
   });
 
   test("plain lyrics stay inert and scroll locally at 320px", async ({ page }) => {
