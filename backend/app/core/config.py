@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     session_ttl_seconds: int = 7 * 24 * 3600
     session_cookie_name: str = "mg_session"
     session_cookie_secure: bool = False
+    online_search_per_user_per_hour: int = 30
+    online_import_per_user_per_hour: int = 20
     login_max_attempts: int = 10
     login_window_seconds: int = 300
     request_access_max_attempts: int = 10

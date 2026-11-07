@@ -46,6 +46,17 @@ services:
     restart: unless-stopped
     # No published ports: the worker is only reachable via the private network.
 
+  ingestion-fake:
+    build:
+      context: ./services/ingestion
+      dockerfile: fake/Dockerfile
+    image: music-gatherings-ingestion-fake:local
+    networks:
+      - app-net
+    restart: unless-stopped
+    # No published ports: deterministic fixture provider for tests/admin panels.
+    # Worker/CLI reach it as http://ingestion-fake:8001.
+
   # Later slices add private (unpublished) services on app-net:
   # - worker (S06): durable job execution, shares app-data volume.
   # - ingestion-genius, ingestion-ultimate-guitar (S07/S08): rate-limited providers.

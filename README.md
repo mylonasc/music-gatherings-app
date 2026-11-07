@@ -76,6 +76,14 @@ Background jobs: `POST /api/v1/jobs` (`maintenance.reindex`,
 The `worker` container claims and runs jobs with leases, bounded retries with
 backoff, and cooperative cancellation; it publishes no ports.
 
+Ingestion (S07): versioned v1 contracts in `contracts/ingestion/v1/`
+(generated from `services/ingestion/common/contracts.py`), per-service
+token-bucket rate limits (overall/search/fetch + spacing/concurrency +
+cooldowns + circuit breaker), a single limited HTTP client choke point,
+TTL caching with in-flight coalescing, per-user backend quotas, and a
+deterministic `ingestion-fake` provider on the private network
+(`http://ingestion-fake:8001`, no published ports).
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
