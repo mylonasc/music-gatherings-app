@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { AddTrackPage } from "../features/adding/AddTrackPage";
+import { AuthLayout } from "../features/auth/AuthLayout";
 import { useAuth } from "../features/auth/AuthContext";
 import { LoginPage, RequestAccessPage } from "../features/auth/AuthPages";
 import { AdminPage } from "../features/admin/AdminPage";
@@ -23,8 +24,10 @@ function Protected() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/request-access" element={<RequestAccessPage />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/request-access" element={<RequestAccessPage />} />
+      </Route>
       <Route element={<Protected />}>
         <Route element={<AppShell />}>
           <Route index element={<TracksPage />} />

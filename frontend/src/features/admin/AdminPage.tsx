@@ -38,7 +38,15 @@ export function AdminPage() {
           <button
             key={name}
             type="button"
-            role="tab"
+             role="tab"
+            id={`admin-tab-${name}`}
+            aria-controls="admin-panel"
+            tabIndex={tab === name ? 0 : -1}
+            onKeyDown={(event) => {
+              const index = TABS.indexOf(name);
+              const next = event.key === "ArrowRight" ? (index + 1) % TABS.length : event.key === "ArrowLeft" ? (index + TABS.length - 1) % TABS.length : event.key === "Home" ? 0 : event.key === "End" ? TABS.length - 1 : null;
+              if (next !== null) { event.preventDefault(); setTab(TABS[next]); document.getElementById(`admin-tab-${TABS[next]}`)?.focus(); }
+            }}
             aria-selected={tab === name}
             onClick={() => setTab(name)}
           >
@@ -46,11 +54,13 @@ export function AdminPage() {
           </button>
         ))}
       </div>
+      <div className="surface-panel" id="admin-panel" role="tabpanel" aria-labelledby={`admin-tab-${tab}`} tabIndex={0}>
       {tab === "requests" && <AccessRequests />}
       {tab === "providers" && <ProvidersPanel />}
       {tab === "processing" && <ProcessingPanel />}
       {tab === "jobs" && <JobsPanel />}
       {tab === "audit" && <AuditLog />}
+      </div>
     </Page>
   );
 }

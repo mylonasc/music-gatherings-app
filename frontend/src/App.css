@@ -68,6 +68,10 @@ label:has(input[type="radio"]:checked) { background: var(--accent-soft); border-
 .action-link:hover { color: white; background: var(--accent-hover); }
 .suggest-form { padding-block: 1rem; }
 .provider-note { display: block; padding: 0 .6rem .6rem; color: var(--muted); }
+.member-card { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+[role="tab"] { text-transform: capitalize; }
+[role="tab"][aria-selected="true"] { background: var(--accent); color: white; }
+[role="tabpanel"] { min-width: 0; }
 @media (min-width: 64rem) { .method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 48rem) { .app-main { padding: 2.5rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

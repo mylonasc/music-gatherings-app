@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../../lib/api-client";
 import { ErrorNotice, Field, Loading, Page } from "../../components/ui";
 import { useAuth } from "./AuthContext";
 
 function redirectTarget(search: string): string {
   const next = new URLSearchParams(search).get("next");
-  return next && next.startsWith("/") ? next : "/";
+  return next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\") ? next : "/";
 }
 
 export function LoginPage() {
@@ -21,8 +21,7 @@ export function LoginPage() {
 
   if (loading) return <Loading />;
   if (user) {
-    navigate(redirectTarget(location.search), { replace: true });
-    return <Loading label="Signed in, taking you to your jam tracks…" />;
+    return <Navigate to={redirectTarget(location.search)} replace />;
   }
 
   async function onSubmit(event: FormEvent) {
