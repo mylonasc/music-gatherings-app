@@ -1,3 +1,4 @@
+from app.models.agent import AgentToken
 from app.models.base import Base
 from app.models.identity import AccessRequest, Crew, CrewMembership, User
 from app.models.library import (
@@ -20,6 +21,7 @@ from app.models.session import AuthSession
 __all__ = [
     "Base",
     "AccessRequest",
+    "AgentToken",
     "Artifact",
     "ArtifactDerivation",
     "AuditEvent",

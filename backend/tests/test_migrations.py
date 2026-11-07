@@ -10,6 +10,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 EXPECTED_TABLES = {
     "access_requests",
+    "agent_tokens",
     "artifact_derivations",
     "artifacts",
     "audit_events",
