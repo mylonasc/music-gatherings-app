@@ -26,6 +26,8 @@ Environment variables (all optional unless noted):
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `MUSIC_GATHERINGS_APP_ENV` | `development` | `production` enables secure cookies |
+| `MUSIC_GATHERINGS_FRONTEND_PORT` | 3000 | Compose published UI host port; internal port stays 8080 |
+| `MUSIC_GATHERINGS_BACKEND_PORT` | 8000 | Compose published API host port; internal port stays 8000 |
 | `MUSIC_GATHERINGS_DATABASE_URL` | `sqlite:////data/database/app.sqlite3` | structured storage |
 | `MUSIC_GATHERINGS_DATA_DIR` | `/data` | object-store root inside containers |
 | `MUSIC_GATHERINGS_MAX_OBJECT_BYTES` | 52428800 | upload/artifact size cap |

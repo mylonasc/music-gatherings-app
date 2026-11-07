@@ -83,6 +83,11 @@ unless the task authorizes it. Preserve unrelated user changes.
   root (see `deploy/OPERATIONS.md`); never commit `.env` or `backups/`.
   Restore is destructive and not yet safely staged/validated (#22); never run it
   against user data as an incidental test. Use isolated disposable volumes.
+- Compose host ports use `MUSIC_GATHERINGS_FRONTEND_PORT` (3000) and
+  `MUSIC_GATHERINGS_BACKEND_PORT` (8000); do not change internal service ports
+  or publish private services to resolve host conflicts. Validate mappings with
+  `python3 -m unittest discover -s tests -p test_compose_config.py` (requires Docker
+  Compose, no running containers or daemon needed).
 
 ## Workflow and maintaining this file
 

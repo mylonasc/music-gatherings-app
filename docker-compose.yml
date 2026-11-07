@@ -5,7 +5,7 @@ services:
     image: music-gatherings-backend:local
     ports:
       # Public API for local development. Published intentionally (see S01).
-      - "8000:8000"
+      - "${MUSIC_GATHERINGS_BACKEND_PORT:-8000}:8000"
     environment:
       MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
       MUSIC_GATHERINGS_DATA_DIR: /data
@@ -24,7 +24,7 @@ services:
     image: music-gatherings-frontend:local
     ports:
       # Public UI for local development. Nginx proxies /api/* to backend.
-      - "3000:8080"
+      - "${MUSIC_GATHERINGS_FRONTEND_PORT:-3000}:8080"
     depends_on:
       - backend
     networks:

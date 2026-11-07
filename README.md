@@ -42,6 +42,23 @@ docker compose up --build
 - Backend health: `http://localhost:8000/health` and `http://localhost:8000/api/v1/health`
 - Via the UI container: `http://localhost:3000/api/v1/health` (nginx proxies to backend)
 
+If another app uses those host ports, set these in `.env` (or export them in
+your shell) before running `docker compose up -d --build`:
+
+```dotenv
+MUSIC_GATHERINGS_FRONTEND_PORT=3100
+MUSIC_GATHERINGS_BACKEND_PORT=8100
+```
+
+Then open `http://localhost:3100`; direct API health is at
+`http://localhost:8100/health`. Defaults remain 3000 and 8000. Only published
+host ports change: nginx, healthchecks, and private services keep their internal
+ports. Containers can reuse internal ports without conflicting with other apps;
+an “address already in use” publishing error normally concerns the host port.
+For local E2E runs on custom ports, set `E2E_BASE_URL=http://localhost:3100`
+and `API_BASE_URL=http://localhost:8100` in the test command environment
+(Compose's `.env` is not automatically loaded by Node/Playwright).
+
 ### First admin and access flow
 
 There are no default credentials. Create the first admin (password via prompt or

@@ -62,6 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose config --quiet
+      - run: python3 -m unittest discover -s tests -p test_compose_config.py
       - run: docker build ./backend
       - run: docker build ./frontend
       - run: docker build ./services/ingestion -f ./services/ingestion/fake/Dockerfile
