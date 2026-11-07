@@ -99,6 +99,14 @@ HTML and text, and reports provenance diagnostics. Invalid profiles and
 active markup are rejected or rendered inert. Schemas in
 `contracts/processor/v1/`.
 
+Online discovery: `POST /api/v1/search/online` runs a provider search job
+without mutating the library; `POST /api/v1/imports` attaches provider
+content to a new or existing track/version with provenance, retry-safe
+deduplication, optional processor-derived representations (cached), and
+lyrics reindexing. `GET /api/v1/tracks/{id}/representations?context=`
+selects audience/guitar/piano views. Per-user quotas gate queue admission;
+provider capacity is bounded by inbound limits plus job retries.
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
