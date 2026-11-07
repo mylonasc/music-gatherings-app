@@ -130,6 +130,92 @@ def test_non_retryable_errors_raise_immediately() -> None:
     asyncio.run(run())
 
 
+def test_streamed_responses_are_bounded_and_closed() -> None:
+    class Body(httpx.AsyncByteStream):
+        closed = False
+
+        async def __aiter__(self):
+            yield b"x" * 65536
+            yield b"y" * 65536
+            raise AssertionError("must stop before reading the rest")
+
+        async def aclose(self):
+            self.closed = True
+
+    body = Body()
+
+    async def run():
+        clock = FakeClock()
+        client = LimitedHttpClient(
+            permissive_limiter(clock), max_response_bytes=70000,
+            client=mock_client(lambda _: httpx.Response(200, stream=body)),
+        )
+        with pytest.raises(InvalidResponseError, match="size limit"):
+            await client.request("fetch", "GET", "https://provider.test/x")
+        assert client.attempt_count == 1
+
+    asyncio.run(run())
+    assert body.closed
+
+
+def test_queued_request_honors_new_cooldown() -> None:
+    clock = FakeClock()
+    limiter = permissive_limiter(clock, max_wait_seconds=120)
+    first_started = asyncio.Event()
+    second_queued = asyncio.Event()
+    starts = []
+
+    async def handle(request):
+        starts.append(clock.now)
+        if len(starts) == 1:
+            first_started.set()
+            await second_queued.wait()
+            return httpx.Response(429, headers={"retry-after": "10"})
+        return httpx.Response(200, json={"ok": True})
+
+    async def run():
+        client = LimitedHttpClient(
+            limiter, client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
+            max_attempts=1, backoff_base_seconds=0, sleep=clock.sleep,
+        )
+
+        async def second():
+            second_queued.set()
+            return await client.request("fetch", "GET", "https://provider.test/second")
+
+        first = asyncio.create_task(client.request("search", "GET", "https://provider.test/first"))
+        await first_started.wait()
+        waiter = asyncio.create_task(second())
+        results = await asyncio.gather(first, waiter, return_exceptions=True)
+        assert results[1].status_code == 200
+        assert starts[1] - starts[0] >= 10
+
+    asyncio.run(run())
+
+
+def test_long_retry_after_is_not_shortened() -> None:
+    from common.alimiter import QueueTimeoutError
+
+    clock = FakeClock()
+    limiter = permissive_limiter(clock, max_wait_seconds=1)
+    calls = []
+
+    def handle(request):
+        calls.append(request)
+        return httpx.Response(429, headers={"retry-after": "600"})
+
+    async def run():
+        client = LimitedHttpClient(
+            limiter, client=mock_client(handle), sleep=clock.sleep, backoff_base_seconds=0,
+        )
+        with pytest.raises(QueueTimeoutError):
+            await client.request("fetch", "GET", "https://provider.test/x")
+
+    asyncio.run(run())
+    assert len(calls) == 1
+    assert limiter.stats().cooldown_remaining >= 600
+
+
 def test_attempts_are_bounded() -> None:
     clock = FakeClock()
 

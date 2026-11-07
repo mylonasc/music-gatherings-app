@@ -49,6 +49,13 @@ class Bucket:
         self._updated_at: float | None = None
 
     def take(self, now: float) -> float:
+        wait = self.wait_seconds(now)
+        if wait <= 0:
+            self._tokens -= 1.0
+        return wait
+
+    def wait_seconds(self, now: float) -> float:
+        """Refill and inspect capacity without consuming a token."""
         if self._updated_at is None:
             self._updated_at = now
         else:
@@ -56,7 +63,6 @@ class Bucket:
             self._tokens = min(self._capacity, self._tokens + elapsed * self._refill)
             self._updated_at = now
         if self._tokens >= 1.0:
-            self._tokens -= 1.0
             return 0.0
         deficit = 1.0 - self._tokens
         return deficit / self._refill if self._refill > 0 else float("inf")

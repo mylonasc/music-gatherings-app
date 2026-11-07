@@ -82,52 +82,55 @@ class AsyncLimiter:
         if self._waiters >= self._config.max_waiters:
             raise QueueFullError("too many queued provider requests")
         self._waiters += 1
+        acquired = False
+        deadline = self._clock() + self._config.max_wait_seconds
         try:
-            await self._wait_turn(bucket)
+            try:
+                if not self._semaphore.locked():
+                    await self._semaphore.acquire()
+                else:
+                    await asyncio.wait_for(
+                        self._semaphore.acquire(), timeout=self._config.max_wait_seconds
+                    )
+            except TimeoutError:
+                raise QueueTimeoutError("timed out waiting for provider concurrency") from None
+            acquired = True
+            await self._wait_turn(bucket, deadline)
+        except BaseException:
+            if acquired:
+                self._semaphore.release()
+            raise
         finally:
             self._waiters -= 1
-        async with self._semaphore:
-            await self._enforce_spacing()
-            self._in_flight += 1
-            self._total_attempts += 1
-            try:
-                yield
-            finally:
-                self._in_flight -= 1
+        self._in_flight += 1
+        self._total_attempts += 1
+        try:
+            yield
+        finally:
+            self._in_flight -= 1
+            self._semaphore.release()
 
-    async def _wait_turn(self, bucket: Bucket) -> None:
-        deadline = self._clock() + self._config.max_wait_seconds
+    async def _wait_turn(self, bucket: Bucket, deadline: float) -> None:
         while True:
             now = self._clock()
             async with self._lock:
-                if now < self._circuit_until:
-                    wait = self._circuit_until - now
-                elif now < self._cooldown_until:
-                    wait = self._cooldown_until - now
-                else:
-                    wait = max(bucket.take(now), self._overall.take(now))
-                    if wait <= 0:
-                        return
+                spacing = (
+                    self._last_start + self._config.min_interval_seconds - now
+                    if self._last_start is not None else 0.0
+                )
+                wait = max(
+                    0.0, self._circuit_until - now, self._cooldown_until - now,
+                    spacing, bucket.wait_seconds(now), self._overall.wait_seconds(now),
+                )
+                if now > deadline and self._config.max_wait_seconds > 0:
+                    raise QueueTimeoutError("timed out waiting for provider capacity")
+                if wait <= 0:
+                    bucket.take(now)
+                    self._overall.take(now)
+                    self._last_start = now
+                    return
             if now + wait > deadline:
                 raise QueueTimeoutError("timed out waiting for provider capacity")
-            await self._sleep(wait)
-
-    async def _enforce_spacing(self) -> None:
-        minimum = self._config.min_interval_seconds
-        if minimum <= 0:
-            async with self._lock:
-                self._last_start = self._clock()
-            return
-        while True:
-            async with self._lock:
-                now = self._clock()
-                if self._last_start is None:
-                    self._last_start = now
-                    return
-                wait = self._last_start + minimum - now
-                if wait <= 0:
-                    self._last_start = now
-                    return
             await self._sleep(wait)
 
     def report_success(self) -> None:

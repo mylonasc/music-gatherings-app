@@ -1,4 +1,4 @@
-"""Genius provider service: official API metadata only, reference-only fetch."""
+"""Private LRCLIB search and lyrics service."""
 
 from common.contracts import (
     CapabilityResponse,
@@ -9,7 +9,7 @@ from common.contracts import (
     StatsResponse,
 )
 from common.service import create_provider_app
-from genius.adapter import SERVICE_NAME, SERVICE_VERSION, adapter_from_env
+from lrclib.adapter import SERVICE_NAME, SERVICE_VERSION, adapter_from_env
 
 _adapter = adapter_from_env()
 
@@ -24,7 +24,7 @@ async def _fetch(body: FetchRequest) -> FetchResponse:
 
 async def _stats() -> StatsResponse:
     return StatsResponse(
-        provider="genius",
+        provider="lrclib",
         limiter=_adapter.limiter.snapshot(),
         upstream_requests=_adapter.http_client.attempt_count,
         throttled_requests=_adapter.limiter.stats().throttled_attempts,

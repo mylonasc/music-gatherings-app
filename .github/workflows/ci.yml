@@ -46,9 +46,9 @@ jobs:
           cache-dependency-path: services/ingestion/common/requirements.txt
       - run: pip install -r services/ingestion/common/requirements.txt
       - run: pip install ruff==0.17.4 mypy==2.4.1 pytest==9.2.0
-      - run: python -m ruff check common fake genius ultimateguitar tests
+      - run: python -m ruff check common fake lrclib ultimateguitar tests
         working-directory: services/ingestion
-      - run: python -m mypy common fake genius ultimateguitar
+      - run: python -m mypy common fake lrclib ultimateguitar
         working-directory: services/ingestion
       - run: python -m ruff check processor
         working-directory: services
@@ -66,7 +66,7 @@ jobs:
       - run: docker build ./backend
       - run: docker build ./frontend
       - run: docker build ./services/ingestion -f ./services/ingestion/fake/Dockerfile
-      - run: docker build ./services/ingestion -f ./services/ingestion/genius/Dockerfile
+      - run: docker build ./services/ingestion -f ./services/ingestion/lrclib/Dockerfile
       - run: docker build ./services/ingestion -f ./services/ingestion/ultimateguitar/Dockerfile
       - run: docker build ./services -f ./services/processor/Dockerfile
 

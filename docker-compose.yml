@@ -68,17 +68,19 @@ services:
     # No published ports: deterministic fixture provider for tests/admin panels.
     # Worker/CLI reach it as http://ingestion-fake:8001.
 
-  ingestion-genius:
+  ingestion-lrclib:
     build:
       context: ./services/ingestion
-      dockerfile: genius/Dockerfile
-    image: music-gatherings-ingestion-genius:local
+      dockerfile: lrclib/Dockerfile
+    image: music-gatherings-ingestion-lrclib:local
     environment:
-      GENIUS_ACCESS_TOKEN: ${GENIUS_ACCESS_TOKEN:-}
+      LRCLIB_ALLOW_STORAGE: ${LRCLIB_ALLOW_STORAGE:-true}
+      LRCLIB_REQUESTS_PER_MINUTE: ${LRCLIB_REQUESTS_PER_MINUTE:-20}
+      LRCLIB_MIN_INTERVAL_SECONDS: ${LRCLIB_MIN_INTERVAL_SECONDS:-0.5}
     networks:
       - app-net
     restart: unless-stopped
-    # No published ports: official Genius API metadata only (reference-only).
+    # No published ports: read-only LRCLIB API; no credentials required.
 
   ingestion-ultimate-guitar:
     build:

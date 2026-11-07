@@ -160,6 +160,44 @@ def test_queue_bound_rejects_overflow() -> None:
         asyncio.run(_acquire(limiter))
 
 
+def test_semaphore_waiters_count_toward_bound_and_cancel_cleanly() -> None:
+    clock = FakeClock()
+    limiter = make_limiter(clock, max_waiters=1)
+    queued = asyncio.Event()
+
+    async def waiter():
+        queued.set()
+        async with limiter.slot("fetch"):
+            pass
+
+    async def run():
+        async with limiter.slot("search"):
+            task = asyncio.create_task(waiter())
+            await queued.wait()
+            assert limiter.stats().waiters == 1
+            with pytest.raises(QueueFullError):
+                await _acquire(limiter)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            assert limiter.stats().waiters == 0
+        await _acquire(limiter)
+
+    asyncio.run(run())
+
+
+def test_concurrency_wait_is_bounded() -> None:
+    limiter = AsyncLimiter(LimiterConfig(max_wait_seconds=0.01))
+
+    async def run():
+        async with limiter.slot("search"):
+            with pytest.raises(QueueTimeoutError, match="concurrency"):
+                await _acquire(limiter)
+        assert limiter.stats().waiters == 0
+
+    asyncio.run(run())
+
+
 async def _acquire(limiter: AsyncLimiter) -> None:
     async with limiter.slot("search"):
         pass

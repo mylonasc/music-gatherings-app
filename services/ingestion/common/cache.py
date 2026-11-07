@@ -97,6 +97,9 @@ class ResponseCache:
                 self._in_flight.pop(key, None)
                 if not waiter.done():
                     waiter.set_exception(exc)
+                    # A future with no coalesced waiter still needs its
+                    # exception retrieved, or asyncio logs it at GC time.
+                    waiter.exception()
             raise
         async with self._lock:
             self._entries[key] = (self._clock() + self._ttl, value)
