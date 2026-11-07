@@ -38,10 +38,23 @@ cp .env.example .env   # optional local overrides; never commit .env
 docker compose config --quiet
 docker compose up --build
 ```
-
 - UI: `http://localhost:3000`
 - Backend health: `http://localhost:8000/health` and `http://localhost:8000/api/v1/health`
 - Via the UI container: `http://localhost:3000/api/v1/health` (nginx proxies to backend)
+
+### First admin and access flow
+
+There are no default credentials. Create the first admin (password via prompt or
+`MUSIC_GATHERINGS_BOOTSTRAP_PASSWORD`, never committed):
+
+```bash
+docker compose exec backend python -m app.cli create-admin --username <name>
+```
+
+Then: users `POST /api/v1/access-requests`, admins approve in
+`POST /api/v1/access-requests/{id}/approve` (approved users join `Jam Crew`
+automatically), and log in via `POST /api/v1/auth/login`, which sets an
+HttpOnly session cookie and returns a CSRF token for mutating requests.
 
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.

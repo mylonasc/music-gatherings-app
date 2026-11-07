@@ -74,6 +74,8 @@ unless the task authorizes it. Preserve unrelated user changes.
 - S02 commands: run `alembic upgrade head` from `backend/` with
   `MUSIC_GATHERINGS_DATABASE_URL` set (the container entrypoint does this
   automatically before starting the API).
+- S03 commands: `python -m app.cli create-admin --username <name>` from
+  `backend/` (or `docker compose exec backend ...`) with the database migrated.
 
 ## Workflow and maintaining this file
 
