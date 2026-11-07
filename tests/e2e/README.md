@@ -28,7 +28,8 @@ docker compose down -v
 
 Always start from a fresh volume: login attempts are throttled per user
 (verified working end-to-end by these very runs), and repeated runs on one
-volume accumulate attempts. CI always uses a fresh volume.
+volume accumulate attempts. CI always uses a fresh volume. For rapid local
+iteration, set `E2E_LOGIN_MAX_ATTEMPTS=100` (see `.env.example`).
 
 ## Conventions
 
