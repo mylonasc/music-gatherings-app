@@ -1,5 +1,6 @@
 test-results/
 playwright-report/
+review-gallery/
 playwright/.cache/
 .auth/
 .seed.json
