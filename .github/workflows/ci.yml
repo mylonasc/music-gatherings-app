@@ -64,6 +64,41 @@ jobs:
       - run: docker compose config --quiet
       - run: docker build ./backend
       - run: docker build ./frontend
+      - run: docker build ./services/ingestion -f ./services/ingestion/fake/Dockerfile
+      - run: docker build ./services/ingestion -f ./services/ingestion/genius/Dockerfile
+      - run: docker build ./services/ingestion -f ./services/ingestion/ultimateguitar/Dockerfile
+      - run: docker build ./services -f ./services/processor/Dockerfile
+
+  backup-restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up -d
+      - name: Seed one track via the API
+        env:
+          RECOVERY_PASSWORD: recovery-ci-pass-1
+        run: |
+          docker compose exec -T -e MUSIC_GATHERINGS_BOOTSTRAP_PASSWORD="${RECOVERY_PASSWORD}" backend python -m app.cli create-admin --username root
+          COOKIE_JAR="$(mktemp)"
+          CSRF="$(curl -sf -X POST http://localhost:8000/api/v1/auth/login -H 'Content-Type: application/json' -d "{\"username\":\"root\",\"password\":\"${RECOVERY_PASSWORD}\"}" -c "${COOKIE_JAR}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrf_token"])')"
+          CREW="$(curl -sf http://localhost:8000/api/v1/crews -b "${COOKIE_JAR}" | python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["id"])')"
+          curl -sf -X POST "http://localhost:8000/api/v1/crews/${CREW}/tracks" -b "${COOKIE_JAR}" -H "X-CSRF-Token: ${CSRF}" -H 'Content-Type: application/json' -d '{"title":"Recovery Song"}' -o /dev/null
+          echo "CREW_ID=${CREW}" >> "${GITHUB_ENV}"
+      - run: ./deploy/backup.sh ./backups
+      - run: docker compose down -v
+      - run: ./deploy/restore.sh ./backups/music-gatherings-*.tgz
+      - run: docker compose up -d
+      - name: Verify restored data and health
+        env:
+          RECOVERY_PASSWORD: recovery-ci-pass-1
+        run: |
+          curl -sf http://localhost:8000/health
+          COOKIE_JAR="$(mktemp)"
+          curl -sf -X POST http://localhost:8000/api/v1/auth/login -H 'Content-Type: application/json' -d "{\"username\":\"root\",\"password\":\"${RECOVERY_PASSWORD}\"}" -c "${COOKIE_JAR}" -o /dev/null
+          COUNT="$(curl -sf "http://localhost:8000/api/v1/crews/${CREW_ID}/tracks?limit=1" -b "${COOKIE_JAR}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["total"])')"
+          test "${COUNT}" = "1"
+      - run: docker compose down -v
+        if: always()
 
   e2e:
     runs-on: ubuntu-latest

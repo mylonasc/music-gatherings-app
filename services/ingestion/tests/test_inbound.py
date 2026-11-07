@@ -1,20 +1,19 @@
 """Inbound gate tests: providers answer 429 (with Retry-After) when saturated."""
 
-import asyncio
 
 from fastapi.testclient import TestClient
 
 from common.alimiter import AsyncLimiter
-from common.contracts import SearchRequest
-from common.limits import LimiterConfig, OperationLimits
-from common.service import create_provider_app
 from common.contracts import (
     CapabilityResponse,
     FetchRequest,
     FetchResponse,
+    SearchRequest,
     SearchResponse,
     StatsResponse,
 )
+from common.limits import LimiterConfig, OperationLimits
+from common.service import create_provider_app
 
 
 def make_app(max_wait_seconds: float = 0.0):  # type: ignore[no-untyped-def]

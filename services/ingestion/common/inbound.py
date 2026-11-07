@@ -11,11 +11,16 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from common.alimiter import AsyncLimiter, QueueFullError, QueueTimeoutError
-from common.limits import LimiterConfig
 
 
 class InboundRateLimitMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, limiter: AsyncLimiter, *, paths: tuple[str, ...] = ("/v1/search", "/v1/fetch")) -> None:  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        app,  # type: ignore[no-untyped-def]
+        limiter: AsyncLimiter,
+        *,
+        paths: tuple[str, ...] = ("/v1/search", "/v1/fetch"),
+    ) -> None:
         super().__init__(app)
         self._limiter = limiter
         self._paths = paths

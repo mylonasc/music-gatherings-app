@@ -11,6 +11,7 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
+from common.alimiter import AsyncLimiter
 from common.contracts import (
     CapabilityResponse,
     FetchRequest,
@@ -20,7 +21,6 @@ from common.contracts import (
     SearchResponse,
     StatsResponse,
 )
-from common.alimiter import AsyncLimiter
 from common.errors import ProviderError
 from common.inbound import InboundRateLimitMiddleware
 from common.limits import LimiterConfig
@@ -52,9 +52,8 @@ def create_provider_app(
     inbound_limits: tuple[str, ...] = ("/v1/search", "/v1/fetch"),
 ) -> FastAPI:
     app = FastAPI(title=f"Ingestion provider: {service_name}", version=version)
-    app.add_middleware(
-        InboundRateLimitMiddleware, limiter=limiter or AsyncLimiter(LimiterConfig()), paths=inbound_limits
-    )
+    gate = limiter or AsyncLimiter(LimiterConfig())
+    app.add_middleware(InboundRateLimitMiddleware, limiter=gate, paths=inbound_limits)
 
     @app.get("/health", response_model=HealthResponse)
     def health() -> HealthResponse:
