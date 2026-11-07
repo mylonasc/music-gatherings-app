@@ -14,6 +14,20 @@
 .primary-nav a { display: flex !important; flex-direction: column; justify-content: center; gap: .1rem; border-radius: .75rem; text-decoration: none; font-size: .75rem; font-weight: 650; padding: .4rem .2rem !important; text-align: center; }
 .primary-nav a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
 .nav-symbol { font-size: 1.45rem; line-height: 1.2; }
+@media (max-width: 47.99rem) {
+  .studio-header { padding: .85rem 1rem; gap: .5rem; }
+  .studio-header .brand p, .studio-header .account-name, .studio-header .avatar { display: none; }
+  .studio-header .brand { gap: .5rem; }
+  .studio-header .brand-mark { width: 2rem; height: 2rem; font-size: 1.4rem; border-radius: .6rem; }
+  .studio-header .brand h1 { font-size: 1rem; }
+  .studio-header .account-area button { font-size: .8rem; padding: .4rem .65rem; }
+}
+/* Short landscape windows (and enlarged text) need all available reading space.
+   Keep navigation in normal flow rather than covering focused form controls. */
+@media (max-height: 32rem) and (max-width: 63.99rem) {
+  .studio-shell { padding-bottom: 0; }
+  .studio-header .primary-nav { position: static; order: 3; width: 100%; border: 0; padding: .3rem 0; }
+}
 @media (min-width: 64rem) {
   .studio-shell { display: grid; grid-template-columns: 16rem minmax(0, 1fr); padding-bottom: 0; min-height: 100dvh; }
   .studio-header { position: sticky; top: 0; height: 100dvh; align-content: start; flex-direction: column; align-items: stretch; justify-content: start; gap: 2.5rem; padding: 2rem 1.25rem; border-right: 1px solid var(--line); border-bottom: 0; overflow-y: auto; }

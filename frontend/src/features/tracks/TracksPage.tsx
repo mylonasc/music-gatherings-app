@@ -7,6 +7,7 @@ import type { CrewTrackList, SearchResponse } from "../../lib/api-types";
 import { useAuth } from "../auth/AuthContext";
 import { SuggestTrackForm } from "./SuggestTrackForm";
 import { TrackCard, displayTitle } from "./TrackCard";
+import { TrackFilters } from "./TrackFilters";
 import "./tracks.css";
 
 export function TracksPage() {
@@ -53,41 +54,7 @@ export function TracksPage() {
       )}
       {crewId && (
         <>
-          <form
-            role="search"
-            aria-label="Filter and search tracks"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSearchNonce((n) => n + 1);
-              reload();
-            }}
-          >
-            <label htmlFor="track-search">Search the library</label>
-            <input
-              id="track-search"
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Title, artist, or lyrics"
-            />
-            <label htmlFor="genre-filter">Genre</label>
-            <input
-              id="genre-filter"
-              value={genreFilter}
-              onChange={(e) => setGenreFilter(e.target.value)}
-              placeholder="Rock"
-            />
-            <label htmlFor="piano-filter">
-              <input
-                id="piano-filter"
-                type="checkbox"
-                checked={pianoOnly}
-                onChange={(e) => setPianoOnly(e.target.checked)}
-              />{" "}
-              Piano-friendly only
-            </label>
-            <button type="submit">Apply</button>
-          </form>
+          <TrackFilters query={searchQuery} genre={genreFilter} pianoOnly={pianoOnly} onQuery={setSearchQuery} onGenre={setGenreFilter} onPiano={setPianoOnly} onApply={() => { setSearchNonce((n) => n + 1); reload(); }} />
           <SuggestTrackForm
             crewId={crewId}
             onCreated={() => {

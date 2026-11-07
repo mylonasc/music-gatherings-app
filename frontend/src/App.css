@@ -5,6 +5,7 @@ body { margin: 0; }
 button, input, select, textarea { font: inherit; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+:where(a, button, input, select, textarea, summary, [tabindex]) { scroll-margin-block: 1rem 7rem; }
 html { scroll-padding-block: 2rem 7rem; }
 a { color: var(--accent); text-underline-offset: .2em; }
 a:hover { color: var(--accent-hover); }
@@ -56,8 +57,8 @@ pre.doc-panel, .doc-panel .chord-chart, .doc-panel pre { font-family: ui-monospa
 .app-header h1 { font-size: 1.3rem; }
 .app-header nav ul { list-style: none; display: flex; gap: .5rem; padding: 0; flex-wrap: wrap; }
 .app-header nav a { display: inline-flex; min-height: 44px; align-items: center; padding: .5rem; }
-.skip-link { position: fixed; left: 1rem; top: -10rem; z-index: 100; padding: 1rem; background: var(--surface); }
-.skip-link:focus { top: 1rem; }
+.skip-link { position: fixed; left: 1rem; top: 0; z-index: 100; padding: 0; background: var(--surface); width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link:focus { top: 1rem; width: auto; height: auto; padding: 1rem; clip-path: none; overflow: visible; white-space: normal; }
 [role="group"], [role="tablist"] { display: flex; gap: .4rem; flex-wrap: wrap; }
 [role="group"]:has(input[type="radio"]) { padding: .5rem; background: var(--surface-muted); border-radius: .8rem; }
 label:has(input[type="radio"]:checked) { background: var(--accent-soft); border-radius: .6rem; color: var(--accent); font-weight: 650; }

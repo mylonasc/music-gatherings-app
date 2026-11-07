@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import "./shell.css";
 
@@ -13,6 +13,7 @@ const destinations = [
 export function AppShell() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const activeDestination = pathname === "/add" || pathname.startsWith("/tracks/") ? "/" : pathname;
   const main = useRef<HTMLElement>(null);
   const previousPath = useRef(pathname);
   useEffect(() => {
@@ -30,9 +31,9 @@ export function AppShell() {
       </div>
       <nav aria-label="Primary" className="primary-nav"><ul>
         {destinations.filter((item) => !item.admin || user?.is_admin).map((item) =>
-          <li key={item.to}><NavLink to={item.to} end={item.end}>
+          <li key={item.to}><Link to={item.to} aria-current={activeDestination === item.to ? "page" : undefined}>
             <span className="nav-symbol" aria-hidden="true">{item.symbol}</span><span>{item.label}</span>
-          </NavLink></li>)}
+          </Link></li>)}
       </ul></nav>
       {user && <div className="account-area"><span className="avatar" aria-hidden="true">{user.username.slice(0, 1).toUpperCase()}</span>
         <span className="account-name">{user.username}</span><button type="button" onClick={() => void logout()}>Sign out</button>
