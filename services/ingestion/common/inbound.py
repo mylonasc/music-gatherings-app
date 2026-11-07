@@ -9,6 +9,7 @@ capacity. Exceeded requests get a structured 429 envelope plus a standard
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
+from starlette.types import ASGIApp
 
 from common.alimiter import AsyncLimiter, QueueFullError, QueueTimeoutError
 
@@ -16,7 +17,7 @@ from common.alimiter import AsyncLimiter, QueueFullError, QueueTimeoutError
 class InboundRateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
-        app,  # type: ignore[no-untyped-def]
+        app: ASGIApp,
         limiter: AsyncLimiter,
         *,
         paths: tuple[str, ...] = ("/v1/search", "/v1/fetch"),

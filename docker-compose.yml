@@ -37,13 +37,17 @@ services:
     image: music-gatherings-backend:local
     # Shares the backend image; entrypoint migrates then execs this command.
     command: ["-m", "app.worker"]
+    # The shared image probes HTTP port 8000, which the worker does not serve.
+    healthcheck:
+      disable: true
     environment:
       MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
       MUSIC_GATHERINGS_DATABASE_URL: sqlite:////data/database/app.sqlite3
     volumes:
       - app-data:/data
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - app-net
     restart: unless-stopped
@@ -91,12 +95,6 @@ services:
       - app-net
     restart: unless-stopped
     # No published ports: private normalization/rendering API.
-
-  # Later slices add private (unpublished) services on app-net:
-  # - worker (S06): durable job execution, shares app-data volume.
-  # - ingestion-genius, ingestion-ultimate-guitar (S07/S08): rate-limited providers.
-  # - processor (S09): normalization/post-processing.
-  # Those services must NOT publish host ports.
 
 networks:
   app-net:

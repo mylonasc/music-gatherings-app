@@ -78,7 +78,10 @@ PROFILE = {
 }
 
 
-def install_transports(monkeypatch, fetch_payload=None, processor_payload=None, search_payload=None, providers=("fake",)):  # type: ignore[no-untyped-def]
+def install_transports(  # type: ignore[no-untyped-def]
+    monkeypatch, fetch_payload=None, processor_payload=None,
+    search_payload=None, providers=("fake",),
+):
     seen = {"search": 0, "fetch": 0, "process": 0}
 
     def provider_handler(request: httpx.Request) -> httpx.Response:
@@ -98,7 +101,9 @@ def install_transports(monkeypatch, fetch_payload=None, processor_payload=None, 
         monkeypatch.setitem(
             online_module.PROVIDER_TRANSPORTS, provider, httpx.MockTransport(provider_handler)
         )
-    monkeypatch.setattr(online_module, "PROCESSOR_TRANSPORT", httpx.MockTransport(processor_handler))
+    monkeypatch.setattr(
+        online_module, "PROCESSOR_TRANSPORT", httpx.MockTransport(processor_handler)
+    )
     return seen
 
 
@@ -313,7 +318,6 @@ def test_per_user_quota_blocks_with_429(tmp_path, monkeypatch):  # type: ignore[
 def test_throttled_search_requeues_with_cooldown(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
     from datetime import timedelta
 
-    from app.models import Job
     from app.models.base import utcnow_naive
 
     app, client, csrf, crew_id = make_env(tmp_path, monkeypatch)
@@ -358,7 +362,9 @@ def test_disabled_provider_fails_fast_without_retries(tmp_path, monkeypatch):  #
     def unavailable(request: httpx.Request) -> httpx.Response:
         return httpx.Response(
             503,
-            json={"error": {"code": "provider_unavailable", "message": "no licensed API", "retryable": False}},
+            json={"error": {
+                "code": "provider_unavailable", "message": "no licensed API", "retryable": False,
+            }},
         )
 
     monkeypatch.setitem(

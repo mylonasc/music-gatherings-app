@@ -43,6 +43,12 @@ env). They never appear in logs, job payloads, diagnostics, or Git.
 
 ## Backup and restore
 
+**Warning:** the current restore script deletes volumes before validating the
+archive, has no rollback, and assumes the default Compose project/volume name.
+Do not use it on the only copy of production data. Safety work is tracked in
+[#22](https://github.com/mylonasc/music-gatherings-app/issues/22); test recovery
+only with isolated disposable volumes until then.
+
 ```bash
 ./deploy/backup.sh [backup-dir]     # stops the stack, archives the volume
 ./deploy/restore.sh <archive.tgz>   # destroys the volume, restores, leaves stack down
@@ -52,7 +58,8 @@ docker compose up -d                # then verify: health, login, one track read
 The archive contains `database/app.sqlite3*` and `objects/` plus a manifest
 (date, volume, git revision). Objects are immutable once written, so a
 stopped-stack tarball plus the SQLite files is a coherent snapshot. The CI
-`backup-restore` job exercises the full cycle on every push to `main`.
+`backup-restore` job is intended to exercise the full cycle on every push to
+`main`; check its actual result rather than assuming recovery is verified.
 
 ## Upgrade procedure
 

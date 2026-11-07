@@ -2,9 +2,9 @@
 
 ## Current state and source of truth
 
-S01 is implemented on `main`: FastAPI backend skeleton (`backend/`), React
-skeleton (`frontend/`), Compose network/volume (`docker-compose.yml`), CI
-(`.github/workflows/ci.yml`), and docs. Later slices are still plans. Read
+S01–S16 implementations are on `main`, but release readiness is not established:
+review follow-ups #18–#25 track security, durability, rendering, and recovery gaps.
+CI configuration is not evidence of a successful run. Read
 `EPIC_APP_BOOTSTRAP.md` for the architecture, stable S01–S16 slices, acceptance
 criteria, and dependency graph. Consult the linked GitHub parent/slice issues
 for current status and decisions.
@@ -36,6 +36,9 @@ unless the task authorizes it. Preserve unrelated user changes.
   tool. Test guessed IDs and cross-crew access, not just authenticated happy paths.
 - Passwords use Argon2id; sessions require secure cookies, CSRF protection, expiry,
   and revocation. No default admin password or committed credentials.
+- Production settings force Secure session cookies; serve production over HTTPS.
+- Online work must enter through validated search/import endpoints, not generic job
+  creation. Idempotency keys are scoped to owner, crew, and kind.
 - Provider terms, package maintenance, credentials, and rights must be verified.
   Unknown/prohibited redistribution defaults to link-only or disabled behavior.
   Never bypass upstream access restrictions.
@@ -78,6 +81,8 @@ unless the task authorizes it. Preserve unrelated user changes.
   `backend/` (or `docker compose exec backend ...`) with the database migrated.
 - S16 operations: `./deploy/backup.sh` / `./deploy/restore.sh` from the repo
   root (see `deploy/OPERATIONS.md`); never commit `.env` or `backups/`.
+  Restore is destructive and not yet safely staged/validated (#22); never run it
+  against user data as an incidental test. Use isolated disposable volumes.
 
 ## Workflow and maintaining this file
 

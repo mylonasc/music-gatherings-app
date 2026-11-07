@@ -3,13 +3,14 @@
 from sqlalchemy import select
 
 from app.models import AgentToken, AuditEvent
-from tests.conftest import make_test_app
-from tests.test_auth import login, seed_admin
 from tests.test_library import setup_two_users, suggest
 
 
 def make_token(client, csrf, crew_id, capabilities=None, name="agent-1"):  # type: ignore[no-untyped-def]
-    body = {"name": name, "crew_id": crew_id, "capabilities": capabilities or ["search.read", "library.read"]}
+    body = {
+        "name": name, "crew_id": crew_id,
+        "capabilities": capabilities or ["search.read", "library.read"],
+    }
     response = client.post("/api/v1/agent-tokens", json=body, headers={"X-CSRF-Token": csrf})
     assert response.status_code == 201, response.text
     return response.json()
@@ -110,7 +111,9 @@ def test_tools_read_within_scope(tmp_path, monkeypatch):  # type: ignore[no-unty
 
     with make_session(app) as db:
         actions = {r.action for r in db.execute(select(AuditEvent)).scalars().all()}
-    assert {"agent.tool.search", "agent.tool.track", "agent.tool.summary", "agent.tool.compare"} <= actions
+    assert {
+        "agent.tool.search", "agent.tool.track", "agent.tool.summary", "agent.tool.compare"
+    } <= actions
     # Plaintext token is never stored.
     with make_session(app) as db:
         stored = db.execute(select(AgentToken)).scalars().all()
@@ -127,7 +130,8 @@ def test_cross_crew_and_revoked_denied(tmp_path, monkeypatch):  # type: ignore[n
     hidden = suggest(admin_client, other_crew, csrf, {"title": "Hidden"})
     token = make_token(admin_client, csrf, crew_id)["token"]
 
-    assert agent_call(admin_client, token, "track", {"track_id": hidden["track_id"]}).status_code == 404
+    denied = agent_call(admin_client, token, "track", {"track_id": hidden["track_id"]})
+    assert denied.status_code == 404
     assert agent_call(admin_client, token, "search", {"query": "hidden"}).json()["total"] == 0
     assert agent_call(admin_client, "mgat-bogus", "search", {"query": "x"}).status_code == 401
     anon = TestClient(app)
@@ -157,8 +161,9 @@ def test_owner_leaving_crew_disables_token(tmp_path, monkeypatch):  # type: igno
     token = make_token(member_client, mcsrf, crew_id, name="mem-token")["token"]
     assert agent_call(member_client, token, "search", {"query": "x"}).status_code == 200
     with make_session(app) as db:
-        from app.models import CrewMembership, User
         from sqlalchemy import select as _select
+
+        from app.models import CrewMembership, User
 
         user = db.execute(_select(User).where(User.username == "mem")).scalar_one()
         membership = db.execute(

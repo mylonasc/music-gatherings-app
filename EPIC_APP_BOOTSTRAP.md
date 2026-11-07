@@ -1,9 +1,11 @@
 # Epic: Bootstrap the Music Gatherings App
 
-Status: **Complete.** S01–S16 are implemented on `main`; all slice issues are
-closed. What remains is continuous work outside this epic: real-device mobile
-checks, webkit CI signal, and provider evolution (see `deploy/OPERATIONS.md`
-known limitations).
+Status: **Implemented, not release-verified.** S01–S16 are on `main` and the
+original slice issues are closed, but review identified material gaps tracked in
+[#18–#25](https://github.com/mylonasc/music-gatherings-app/issues?q=is%3Aissue+is%3Aopen).
+These include HTML trust, worker leases, import recovery, search correctness,
+musical alignment, destructive restore safety, storage cleanup, and stale UI state.
+Do not interpret implementation completion as production readiness or successful CI.
 
 ## 1. Purpose and scope
 

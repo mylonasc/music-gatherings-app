@@ -3,7 +3,7 @@
 import httpx
 
 from app.jobs import online as online_module
-from app.models import AuditEvent, ProcessingProfile
+from app.models import AuditEvent
 from tests.conftest import make_test_app
 from tests.test_auth import login, seed_admin
 
@@ -42,7 +42,11 @@ def install_processor(monkeypatch, validate_payload=None, process_payload=None):
             return httpx.Response(
                 200,
                 json=process_payload
-                or {"outputs": {"lyrics_html": "<p>hi</p>"}, "warnings": [], "processor_version": "0.1.0"},
+                or {
+                    "outputs": {"lyrics_html": "<p>hi</p>"},
+                    "warnings": [],
+                    "processor_version": "0.1.0",
+                },
             )
         return httpx.Response(404, json={})
 

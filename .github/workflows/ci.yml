@@ -45,7 +45,7 @@ jobs:
           cache: pip
           cache-dependency-path: services/ingestion/common/requirements.txt
       - run: pip install -r services/ingestion/common/requirements.txt
-      - run: pip install ruff==0.17.4 mypy==2.4.1
+      - run: pip install ruff==0.17.4 mypy==2.4.1 pytest==9.2.0
       - run: python -m ruff check common fake genius ultimateguitar tests
         working-directory: services/ingestion
       - run: python -m mypy common fake genius ultimateguitar
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker compose up -d
+      - run: docker compose up -d --build --wait --wait-timeout 180
       - name: Seed one track via the API
         env:
           RECOVERY_PASSWORD: recovery-ci-pass-1
@@ -87,7 +87,7 @@ jobs:
       - run: ./deploy/backup.sh ./backups
       - run: docker compose down -v
       - run: ./deploy/restore.sh ./backups/music-gatherings-*.tgz
-      - run: docker compose up -d
+      - run: docker compose up -d --wait --wait-timeout 180
       - name: Verify restored data and health
         env:
           RECOVERY_PASSWORD: recovery-ci-pass-1
@@ -112,7 +112,7 @@ jobs:
       - run: npm ci --prefix tests/e2e
       - run: npx playwright install --with-deps chromium webkit
         working-directory: tests/e2e
-      - run: docker compose up -d --build
+      - run: docker compose up -d --build --wait --wait-timeout 180
       - name: Seed E2E data
         run: |
           docker compose exec -T -e MUSIC_GATHERINGS_BOOTSTRAP_PASSWORD="${E2E_ADMIN_PASSWORD}" backend python -m app.cli create-admin --username root
