@@ -91,6 +91,14 @@ never stored; `ingestion-ultimate-guitar` is explicitly disabled (no public
 or licensed UG API exists; scraping would violate ToS/publisher rights) and
 returns structured 503s. Both publish no ports.
 
+Processor (`services/processor/`, private `http://processor:8004`): parses
+plain-text chord charts into versioned canonical documents, applies a
+validated step registry (`normalize_sections`, conservative
+`expand_repeated_chords`, `transpose`), renders escaped lyrics/chord-chart
+HTML and text, and reports provenance diagnostics. Invalid profiles and
+active markup are rejected or rendered inert. Schemas in
+`contracts/processor/v1/`.
+
 Only `backend:8000` and `frontend:8080` (host `3000`) are published. Future
 worker/ingestion/processor services join `app-net` without published ports.
 
