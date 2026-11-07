@@ -17,7 +17,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.jobs.context import JobCancelled, JobContext, JobTimedOut, RetryLater
+from app.jobs.context import (
+    FatalJobError,
+    JobCancelled,
+    JobContext,
+    JobTimedOut,
+    RetryLater,
+)
 from app.models import Job
 from app.models.base import utcnow_naive
 from app.storage.local import LocalObjectStore
@@ -208,6 +214,17 @@ def run_claimed_job(
     )
     try:
         result = kind.handler(ctx)
+    except FatalJobError as exc:
+        db.rollback()
+        fresh = db.get(Job, job.id)
+        assert fresh is not None
+        fresh.status = "failed"
+        fresh.error = str(exc)[:2000]
+        fresh.finished_at = utcnow_naive()
+        fresh.worker_id = None
+        fresh.lease_expires_at = None
+        db.flush()
+        return fresh
     except RetryLater as exc:
         db.rollback()
         fresh = db.get(Job, job.id)

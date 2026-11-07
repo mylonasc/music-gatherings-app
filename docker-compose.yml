@@ -9,6 +9,9 @@ services:
     environment:
       MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
       MUSIC_GATHERINGS_DATA_DIR: /data
+      # Test-only override for E2E iteration (login attempts are throttled per
+      # user; unit tests cover the default of 10). Never raise this in prod.
+      MUSIC_GATHERINGS_LOGIN_MAX_ATTEMPTS: ${E2E_LOGIN_MAX_ATTEMPTS:-10}
     volumes:
       - app-data:/data
     networks:

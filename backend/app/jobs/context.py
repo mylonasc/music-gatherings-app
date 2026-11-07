@@ -18,6 +18,13 @@ class JobTimedOut(Exception):
     pass
 
 
+class FatalJobError(Exception):
+    """The job can never succeed (bad input, disabled provider, not found).
+
+    Marked failed immediately without consuming retries.
+    """
+
+
 class RetryLater(Exception):
     """Requeue the job after ``delay_seconds`` without counting an attempt.
 

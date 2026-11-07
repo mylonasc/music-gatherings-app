@@ -7,7 +7,7 @@ test("seeded tracks render with metadata on the default route", async ({ page })
   await page.goto("/");
   const card = page.locator(".track-card", { hasText: "Blue Test Engine" });
   await expect(card.getByText("Blue Test Engine — The Determinists")).toBeVisible();
-  await expect(card.getByText("Test")).toBeVisible();
+  await expect(card.getByText("Test", { exact: true })).toBeVisible();
   await expect(card.getByText("Votes 1")).toBeVisible();
   await expect(card.getByRole("button", { name: "+1" })).toHaveAttribute("aria-pressed", "true");
   await expect(card.getByText(/piano-friendly/)).toBeVisible();

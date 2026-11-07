@@ -19,8 +19,14 @@ test("suggesting a track adds it to the jam list", async ({ page }) => {
 });
 
 test("voting updates the score", async ({ page }) => {
+  // Vote on a track this test suggests itself: parallel projects share the
+  // seeded library, so asserting on seeded vote counts would race.
+  const title = `E2E Vote ${Date.now()}`;
   await page.goto("/");
-  const card = page.locator(".track-card", { hasText: "Untitled track" });
+  await page.getByRole("button", { name: "Suggest a track" }).click();
+  await page.getByLabel("Title (optional)").fill(title);
+  await page.getByRole("button", { name: "Suggest", exact: true }).click();
+  const card = page.locator(".track-card", { hasText: title });
   await expect(card.getByText("Votes 0")).toBeVisible();
   await card.getByRole("button", { name: "+1" }).click();
   await expect(card.getByText("Votes 1")).toBeVisible();
@@ -65,6 +71,9 @@ test.describe("narrow viewport documents", () => {
     const seed = loadSeed();
     await page.goto(`/tracks/${seed.renderedTrackId}`);
     await page.getByLabel("guitar", { exact: true }).check();
+    // Wait for the guitar rendering itself, not just any panel: the previous
+    // context's panel stays mounted until the new fetch resolves.
+    await expect(page.locator(".doc-panel .chord-line").first()).toBeVisible();
     const panel = page.locator(".doc-panel").first();
     await expect(panel).toBeVisible();
     const containment = await panel.evaluate((element) => ({

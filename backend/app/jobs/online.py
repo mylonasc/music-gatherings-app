@@ -14,7 +14,7 @@ from typing import Any
 import httpx
 
 from app.core.config import Settings
-from app.jobs.context import JobContext, RetryLater
+from app.jobs.context import FatalJobError, JobContext, RetryLater
 
 # Tests override transports to drive the fake provider / processor in-process.
 # Production uses plain HTTP on the private Compose network.
@@ -69,8 +69,14 @@ def post_provider(
             f"provider throttled {operation}",
         )
     if response.status_code >= 400:
-        detail = _error_detail(response)
-        raise ProviderFailure(f"{operation} failed ({response.status_code}): {detail}")
+        code, detail = _error_code_and_detail(response)
+        message = f"{operation} failed ({response.status_code}) [{code or 'error'}]: {detail}"
+        if code in ("provider_unavailable", "not_configured", "forbidden", "not_found"):
+            # Definitive answers: retrying cannot help, fail fast.
+            raise FatalJobError(message)
+        if 400 <= response.status_code < 500:
+            raise FatalJobError(message)
+        raise ProviderFailure(message)
     try:
         body = response.json()
     except ValueError as exc:
@@ -80,14 +86,19 @@ def post_provider(
     return body
 
 
-def _error_detail(response: httpx.Response) -> str:
+def _error_code_and_detail(response: httpx.Response) -> tuple[str, str]:
     try:
         body = response.json()
     except ValueError:
-        return (response.text or "")[:200]
+        return "", (response.text or "")[:200]
     if isinstance(body, dict) and isinstance(body.get("error"), dict):
-        return str(body["error"].get("message", ""))[:200]
-    return (response.text or "")[:200]
+        error = body["error"]
+        return str(error.get("code", "")), str(error.get("message", ""))[:200]
+    return "", (response.text or "")[:200]
+
+
+def _error_detail(response: httpx.Response) -> str:
+    return _error_code_and_detail(response)[1]
 
 
 def handle_online_search(ctx: JobContext) -> dict[str, Any]:
@@ -513,7 +524,11 @@ def _call_processor(ctx: JobContext, source_text: str, profile: dict[str, Any]) 
             "processor throttled",
         )
     if response.status_code >= 400:
-        raise ProviderFailure(f"processor failed ({response.status_code})")
+        code, detail = _error_code_and_detail(response)
+        message = f"processor failed ({response.status_code}): {detail}"
+        if 400 <= response.status_code < 500:
+            raise FatalJobError(message)
+        raise ProviderFailure(message)
     try:
         body = response.json()
     except ValueError as exc:

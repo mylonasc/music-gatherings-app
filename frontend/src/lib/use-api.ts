@@ -66,6 +66,7 @@ export function useText(path: string | null) {
     const controller = new AbortController();
     setLoading(true);
     setError(null);
+    setData(null);
     getText(path, controller.signal)
       .then(setData)
       .catch((err: unknown) => {

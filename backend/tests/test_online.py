@@ -354,6 +354,33 @@ def test_throttled_search_requeues_with_cooldown(tmp_path, monkeypatch):  # type
     assert calls["n"] == 2
 
 
+def test_disabled_provider_fails_fast_without_retries(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
+    def unavailable(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            503,
+            json={"error": {"code": "provider_unavailable", "message": "no licensed API", "retryable": False}},
+        )
+
+    monkeypatch.setitem(
+        online_module.PROVIDER_TRANSPORTS, "ultimate_guitar", httpx.MockTransport(unavailable)
+    )
+    app, client, csrf, crew_id = make_env(tmp_path, monkeypatch)
+    started = client.post(
+        "/api/v1/search/online",
+        json={"query": "blue", "providers": ["ultimate_guitar"], "crew_id": crew_id},
+        headers={"X-CSRF-Token": csrf},
+    )
+    assert started.status_code == 202
+    status, _result = run_job(app, started.json()["id"])
+    assert status == "failed"
+    with factory_session(app) as db:
+        from app.models import Job
+
+        job = db.get(Job, started.json()["id"])
+        assert job is not None and job.attempts == 0
+        assert "provider_unavailable" in (job.error or "")
+
+
 def test_cross_crew_import_denied(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
     from fastapi.testclient import TestClient
 
