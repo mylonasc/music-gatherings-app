@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: music-gatherings-backend:local
+    ports:
+      # Public API for local development. Published intentionally (see S01).
+      - "8000:8000"
+    environment:
+      MUSIC_GATHERINGS_APP_ENV: ${MUSIC_GATHERINGS_APP_ENV:-development}
+      MUSIC_GATHERINGS_DATA_DIR: /data
+    volumes:
+      - app-data:/data
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    image: music-gatherings-frontend:local
+    ports:
+      # Public UI for local development. Nginx proxies /api/* to backend.
+      - "3000:8080"
+    depends_on:
+      - backend
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  # Later slices add private (unpublished) services on app-net:
+  # - worker (S06): durable job execution, shares app-data volume.
+  # - ingestion-genius, ingestion-ultimate-guitar (S07/S08): rate-limited providers.
+  # - processor (S09): normalization/post-processing.
+  # Those services must NOT publish host ports.
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  app-data:
