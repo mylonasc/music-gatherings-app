@@ -14,6 +14,7 @@ from app.api.v1.jobs import JobOut, _job_out
 from app.api.v1.schemas import ArtifactOut
 from app.api.v1.visibility import crew_or_404, visible_track
 from app.core.config import Settings
+from app.core.providers import PROVIDER_NAMES
 from app.core.quotas import QuotaExceeded
 from app.jobs.online import provider_client
 from app.jobs.service import create_job
@@ -21,7 +22,6 @@ from app.models import Artifact, ArtifactDerivation, SourceRecord, TrackVersion,
 
 router = APIRouter()
 
-PROVIDER_NAMES = ("fake", "lrclib", "ultimate_guitar")
 ARTIFACT_TYPES = ("lyrics", "chord_chart", "tablature", "sheet_music")
 
 

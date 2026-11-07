@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_settings, require_admin, verify_csrf
 from app.api.v1.jobs import JobList, _job_out
 from app.core.config import Settings
+from app.core.providers import PROVIDER_NAMES
 from app.jobs import online as online_module
 from app.jobs.online import (
     _error_code_and_detail,
@@ -28,7 +29,7 @@ from app.models import AuditEvent, Job, ProcessingProfile, User
 
 router = APIRouter()
 
-ADMIN_PROVIDERS = ("fake", "lrclib", "ultimate_guitar")
+ADMIN_PROVIDERS = PROVIDER_NAMES
 
 
 class ProviderStatus(BaseModel):

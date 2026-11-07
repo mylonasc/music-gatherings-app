@@ -3,6 +3,8 @@ from typing import Self
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.core.providers import DEFAULT_PROVIDER_URLS
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="MUSIC_GATHERINGS_", extra="ignore")
@@ -15,11 +17,7 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = 1.0
     worker_lease_seconds: float = 300.0
     worker_max_retries: int = 3
-    online_provider_urls: dict[str, str] = {
-        "fake": "http://ingestion-fake:8001",
-        "lrclib": "http://ingestion-lrclib:8002",
-        "ultimate_guitar": "http://ingestion-ultimate-guitar:8003",
-    }
+    online_provider_urls: dict[str, str] = DEFAULT_PROVIDER_URLS.copy()
     processor_url: str = "http://processor:8004"
     processor_timeout_seconds: float = 60.0
     provider_timeout_seconds: float = 15.0
