@@ -1,6 +1,7 @@
 """Durable jobs and audit trail (behavior lands in S06/S15)."""
 
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -37,8 +38,8 @@ class Job(Base, Identified):
     idempotency_key: Mapped[str | None] = mapped_column(
         String(128), nullable=True, unique=True
     )
-    payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
-    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     error: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     progress: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     wait_reason: Mapped[str | None] = mapped_column(String(512), nullable=True)
@@ -64,4 +65,4 @@ class AuditEvent(Base, Identified, CreatedOnly):
     action: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     entity_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
     entity_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    detail: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    detail: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)

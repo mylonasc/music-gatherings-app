@@ -1,5 +1,7 @@
 """Provenance and artifact schema: sources, stored objects, derivations."""
 
+from typing import Any
+
 from sqlalchemy import JSON, Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -87,9 +89,9 @@ class ArtifactDerivation(Base, Identified, CreatedOnly):
     )
     processor_name: Mapped[str] = mapped_column(String(64), nullable=False)
     processor_version: Mapped[str] = mapped_column(String(32), nullable=False)
-    profile: Mapped[dict] = mapped_column(JSON, nullable=False)
-    input_artifact_ids: Mapped[list] = mapped_column(JSON, nullable=False)
-    diagnostics: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    profile: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    input_artifact_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    diagnostics: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
 
 class ProcessingProfile(Base, Identified, CreatedOnly):
@@ -100,7 +102,7 @@ class ProcessingProfile(Base, Identified, CreatedOnly):
 
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False)
-    config: Mapped[dict] = mapped_column(JSON, nullable=False)
+    config: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_by_id: Mapped[str | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
