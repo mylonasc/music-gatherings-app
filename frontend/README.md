@@ -1,7 +1,10 @@
 # UI module guide
 
-The production UI is the studio replacement specified by
-`../EPIC_UI_IMRPOVEMENTS.md` (#27), not a parallel theme or alternate application.
+The production UI is the studio replacement delivered by
+[UI epic #27](https://github.com/mylonasc/music-gatherings-app/issues/27) and PR #41,
+not a parallel theme or alternate application. All twelve implementation slices
+are complete; optional maintainability refinements remain in
+[#40](https://github.com/mylonasc/music-gatherings-app/issues/40).
 
 ## Ownership
 

@@ -57,8 +57,10 @@ unless the task authorizes it. Preserve unrelated user changes.
 
 ## Frontend and testing
 
-- UI replacement is tracked in `EPIC_UI_IMRPOVEMENTS.md` (parent #27, UI-01–UI-12),
-  merged via PR #41. Use scoped follow-up branches; reference owning issues in commits.
+- UI replacement is complete (parent #27, UI-01–UI-12), merged via PR #41;
+  PR #44 adds mobile recovery, removal, and compact reactions. Historical scope and
+  evidence live in #27; optional UI debt stays in #40. Use scoped follow-up branches;
+  reference owning issues in commits.
   Shared visual tokens live in `frontend/src/styles/tokens.css`; use semantic
   primitives through `components/ui` and avoid broad descendant section styling.
 - UI boundaries and extension recipes: `frontend/README.md`. Track viewers are

@@ -5,7 +5,7 @@
 The studio UI replaces the original interface, with phone bottom navigation,
 desktop sidebar, an extensible music-reading workspace, and separate suggestion,
 material-attachment, discovery and import modules. See
-[`EPIC_UI_IMRPOVEMENTS.md`](EPIC_UI_IMRPOVEMENTS.md) (#27) and
+[completed UI epic #27](https://github.com/mylonasc/music-gatherings-app/issues/27) and
 [`frontend/README.md`](frontend/README.md) for architecture and extension recipes.
 
 Visual review: `bash tests/e2e/run-isolated.sh` creates only a disposable test
