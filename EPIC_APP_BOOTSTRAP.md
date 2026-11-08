@@ -32,7 +32,9 @@ Working defaults (not previously confirmed product decisions):
 
 ## 2. User experience: mobile first
 
-The replacement UI is specified and sliced in `EPIC_UI_IMRPOVEMENTS.md` (#27).
+The replacement UI's twelve slices are complete in
+[epic #27](https://github.com/mylonasc/music-gatherings-app/issues/27), merged via
+PR #41; PR #44 adds mobile recovery, authorized removal, and compact reactions.
 Its implementation keeps these product/authorization boundaries and adds typed
 viewer/method seams, safe HTML sanitation, identity-keyed state, and a six-device
 visual-review suite. Extension recipes live in `frontend/README.md`.
