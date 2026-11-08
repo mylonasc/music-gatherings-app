@@ -126,7 +126,7 @@ jobs:
         env:
           E2E_ADMIN_PASSWORD: e2e-admin-ci-pass-1
       - name: Browser journeys in pinned Playwright environment
-        run: docker run --rm --network host --ipc=host -e CI=true -v "$PWD/tests/e2e:/work" -w /work mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd npx playwright test
+        run: docker run --rm --network host --add-host=lan-http.test:127.0.0.1 --ipc=host -e CI=true -v "$PWD/tests/e2e:/work" -w /work mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd npx playwright test
       - uses: actions/upload-artifact@v4
         id: ui-evidence
         if: always()
