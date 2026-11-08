@@ -58,3 +58,37 @@ gen:api --prefix frontend`. Keep lockfiles and generated types committed.
 Optional refinements, not architecture/security deferrals: #40 (`techdebt-ui-epic`).
 Real-device usability, virtual keyboards, and manual screen-reader checks remain
 release review items beyond emulated browser/axe coverage.
+
+## Mobile HTTP compatibility and diagnostics
+
+LAN development URLs such as `http://192.168.x.x` are not secure contexts even
+though `http://localhost` is considered trustworthy by browsers. Never invoke
+HTTPS-only APIs during rendering. Import idempotency keys use lazy
+`crypto.getRandomValues` (also available on HTTP); if unavailable, omit the optional
+client key rather than crash or introduce a predictable security token. These are
+non-secret deduplication keys, not authentication credentials. Production still
+requires HTTPS and Secure session cookies.
+
+Root and route error boundaries provide recovery instead of unmounting the whole
+UI into a blank screen. Route failures retain navigation; changing routes resets
+the route boundary. Global JavaScript/rejection errors and failed HTTP requests
+record only a redacted category, route template, status/timing and timestamp.
+
+Open **Crew → Troubleshooting and diagnostics**, or `/diagnostics`, to enable
+request timings in the current tab, reproduce, then inspect/download the JSON
+report before reloading. A crash screen offers the same download directly. The
+report includes secure-context/API availability, viewport, browser user agent,
+and built JS asset fingerprints. Its bounded 40-event buffer stays in memory;
+there is no automatic upload, local/session storage, or backend telemetry endpoint.
+Reloading clears it and disables successful-request recording. Never add query
+strings, IDs, song content, credentials, raw exception messages/stacks, cookies,
+headers or request bodies. See `lib/diagnostics.ts` and its privacy tests.
+
+## Removing tracks
+
+`can_remove` is computed by the backend for each crew listing/entry. Only the
+adding user or an admin sees Delete controls; the DELETE endpoint independently
+enforces ownership, crew authorization and CSRF. Confirmation removes the listing
+and votes from that crew. It does **not** globally erase tracks, files, versions,
+or another crew's listing. A removed member loses access when no remaining crew
+grants visibility. Permanent orphan/file cleanup is a separate storage concern.
