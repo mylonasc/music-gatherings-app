@@ -87,6 +87,7 @@ describe("jam tracks page", () => {
     const plusOnes = screen.getAllByRole("button", { name: "+1" });
     expect(plusOnes[0]).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/piano-friendly/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Delete track" })).not.toBeInTheDocument();
   });
 
   it("shows an empty state when the crew has no tracks", async () => {

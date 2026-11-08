@@ -27,6 +27,10 @@
 .library-filters summary { cursor: pointer; min-height: 44px; padding-block: .5rem; font-weight: 650; }
 .library-filters details .field { margin-block: .5rem; }
 .library-filters { position: relative; }
+.track-delete { margin-top: .8rem; }
+.track-delete button.danger-action { color: var(--danger); border-color: var(--danger); background: var(--surface); }
+.track-delete button.danger-action:hover:not(:disabled) { background: var(--danger-soft); }
+.delete-confirmation { display: block; padding: 1rem; margin-top: .75rem; background: var(--danger-soft); border: 1px solid var(--danger); border-radius: .75rem; max-width: 36rem; }
 @media (max-width: 47.99rem) {
   .library-intro h3 { font-size: 1.05rem; }
   .library-intro p { margin-block: .5rem; font-size: .9rem; }

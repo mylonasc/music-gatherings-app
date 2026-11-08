@@ -68,6 +68,7 @@ export interface CrewTrackEntryOut {
   piano_suitability: string;
   vote_score: number;
   my_vote: number | null;
+  can_remove?: boolean;
 }
 
 export interface CrewTrackList {
@@ -89,6 +90,7 @@ export interface CrewTrackListItem {
   my_vote: number | null;
   version_count: number;
   artifact_kinds: string[];
+  can_remove?: boolean;
 }
 
 export interface CrewTrackPatch {

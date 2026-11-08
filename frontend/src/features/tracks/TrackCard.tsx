@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { Badge } from "../../components/ui";
 import type { CrewTrackListItem } from "../../lib/api-types";
 import { VoteButtons } from "./VoteButtons";
+import { DeleteTrackControl } from "./DeleteTrackControl";
 
 export function displayTitle(title: string | null, artist: string | null): string {
   return title && artist ? `${title} — ${artist}` : title ?? artist ?? "Untitled track";
 }
 
-export function TrackCard({ item, crewId }: { item: CrewTrackListItem; crewId: string }) {
+export function TrackCard({ item, crewId, onDeleted }: { item: CrewTrackListItem; crewId: string; onDeleted: () => void }) {
   const [vote, setVote] = useState({ score: item.vote_score, myVote: item.my_vote });
   return <li className="track-card library-card">
     <div className="track-card-heading"><span className="song-mark" aria-hidden="true">♫</span>
@@ -26,5 +27,6 @@ export function TrackCard({ item, crewId }: { item: CrewTrackListItem; crewId: s
     </div>
     <VoteButtons crewId={crewId} crewTrackId={item.crew_track_id} score={vote.score} myVote={vote.myVote}
       onChanged={(score, myVote) => setVote({ score, myVote })} />
+    {item.can_remove && <DeleteTrackControl crewId={crewId} crewTrackId={item.crew_track_id} title={item.title ?? item.artist ?? "Untitled track"} onDeleted={onDeleted} />}
   </li>;
 }

@@ -113,6 +113,7 @@ def _list_item(
         my_vote=my_vote(db, entry.id, user.id),
         version_count=version_count(db, track.id),
         artifact_kinds=version_artifact_kinds(db, track.id),
+        can_remove=user.is_admin or entry.added_by_id == user.id,
     )
 
 
@@ -351,6 +352,7 @@ def _entry_out(db: Session, entry: CrewTrack, crew_name: str, user: User) -> Cre
         crew_track_id=entry.id,
         crew_id=entry.crew_id,
         crew_name=crew_name,
+        can_remove=user.is_admin or entry.added_by_id == user.id,
         requester=_requester_name(db, entry.added_by_id),
         notes=entry.notes,
         piano_suitability=entry.piano_suitability,
