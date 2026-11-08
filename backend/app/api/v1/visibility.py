@@ -67,6 +67,13 @@ def my_vote(db: Session, crew_track_id: str, user_id: str) -> int | None:
     return row
 
 
+def upvote_count(db: Session, crew_track_id: str) -> int:
+    """Positive reactions only; historical negative votes are not likes."""
+    return int(db.execute(select(func.count()).select_from(TrackVote).where(
+        TrackVote.crew_track_id == crew_track_id, TrackVote.value == 1,
+    )).scalar_one())
+
+
 def track_genre_names(db: Session, track_id: str) -> list[str]:
     from app.models import Genre, TrackGenre
 

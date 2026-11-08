@@ -69,6 +69,7 @@ export interface CrewTrackEntryOut {
   vote_score: number;
   my_vote: number | null;
   can_remove?: boolean;
+  upvote_count?: number;
 }
 
 export interface CrewTrackList {
@@ -91,6 +92,7 @@ export interface CrewTrackListItem {
   version_count: number;
   artifact_kinds: string[];
   can_remove?: boolean;
+  upvote_count?: number;
 }
 
 export interface CrewTrackPatch {
