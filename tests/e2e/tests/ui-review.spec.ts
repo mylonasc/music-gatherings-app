@@ -23,9 +23,9 @@ test.describe("member review journeys", () => {
     await page.getByLabel("Genres (comma-separated, optional)").fill("Test");
     await page.getByRole("button", { name: "Suggest", exact: true }).click();
     const card = page.locator(".library-card", { hasText: title });
-    await expect(card.getByText("Votes 0")).toBeVisible();
-    await card.getByRole("button", { name: "+1", exact: true }).click();
-    await expect(card.getByText("Votes 1")).toBeVisible();
+    await expect(card.getByRole("status")).toHaveText("0 thumbs up");
+    await card.getByRole("button", { name: "Give thumbs up", exact: true }).click();
+    await expect(card.getByRole("status")).toHaveText("1 thumbs up");
     await checkpoint(page, info, "00-crew-vote");
     await expectNoSeriousA11yViolations(page);
   });

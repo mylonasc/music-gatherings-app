@@ -43,6 +43,11 @@ your live session. Other checks cover crash recovery with navigation retained,
 local diagnostic downloads, and confirmation/cancellation/deletion of owned tracks.
 Native runs outside the script need that hostname mapping too; prefer the script.
 
+`compact-tracks.spec.ts` checks a compact card height at 320px, 44px icon targets,
+and independent thumbs-up toggles for two real approved users (including reloads
+and removal of only one's own reaction). Successful compact-list screenshots are
+attached to the review gallery. Existing visual baselines are not auto-updated.
+
 ## Inspecting screenshots
 
 - `review-gallery/index.html`: standalone gallery, including **successful**

@@ -55,22 +55,22 @@ test.describe("recovery and removal", () => {
     await page.getByLabel("Title (optional)").fill(title);
     await page.getByRole("button", { name: "Suggest", exact: true }).click();
     await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Delete track", exact: true }).click();
+    await page.getByRole("button", { name: /^Delete track:/ }).click();
     await expect(page.getByRole("button", { name: "Cancel deletion" })).toBeFocused();
     await checkpoint(page, info, "confirm-crew-track-removal");
     await page.getByRole("button", { name: "Cancel deletion" }).click();
     await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Delete track", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: /^Delete track:/ })).toBeFocused();
     // Also verify the list control updates the list rather than leaving a stale card.
     await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Jam tracks", exact: true }).click();
     const card = page.locator(".library-card", { hasText: title });
-    await card.getByRole("button", { name: "Delete track", exact: true }).click();
+    await card.getByRole("button", { name: /^Delete track:/ }).click();
     await card.getByRole("button", { name: "Delete from crew", exact: true }).click();
     await expect(card).toHaveCount(0);
     await expect(page.getByText("Track deleted from this crew.", { exact: true })).toBeVisible();
     await expectNoPageOverflow(page);
     await page.goto(`/tracks/${loadSeed().trackId}`);
     await expect(page.getByRole("heading", { name: "Blue Test Engine", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Delete track", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Delete track:/ })).toHaveCount(0);
   });
 });

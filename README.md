@@ -26,6 +26,10 @@ Track cards/details expose **Delete track** for the adding user and admins. The
 confirmation removes the crew listing and votes; shared music files and other
 crews' listings remain intact.
 
+Track cards use a compact summary with a single thumbs-up toggle/count and a small
+bin icon. Tap thumbs up again to remove your own reaction; counts reflect positive
+reactions only. Both icon actions retain touch-friendly targets and accessible names.
+
 S01 foundation: FastAPI backend skeleton + mobile-first React frontend skeleton,
 private Compose network, and named `app-data` volume. See `EPIC_APP_BOOTSTRAP.md`
 for the full plan (slices S01–S16) and `AGENTS.md` for contributor rules.

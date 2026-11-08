@@ -92,3 +92,18 @@ enforces ownership, crew authorization and CSRF. Confirmation removes the listin
 and votes from that crew. It does **not** globally erase tracks, files, versions,
 or another crew's listing. A removed member loses access when no remaining crew
 grants visibility. Permanent orphan/file cleanup is a separate storage concern.
+
+## Compact library reactions
+
+Library cards keep title, requester/genres/version count, and material badges in
+one compact summary, with actions alongside it. The bin is visually small but its
+button retains a 44px target, a track-specific accessible label, and confirmation.
+Cards expand naturally for long metadata or enlarged text rather than clipping it.
+
+`UpvoteToggle` is the only library reaction control: press to give a thumbs up,
+press again to remove your own reaction. `aria-pressed`, styling and the live count
+reflect the confirmed server state, not an optimistic success. Pending requests
+are locked against double taps; failures keep the prior reaction/count visible.
+The additive `upvote_count` API field counts positive votes only. Legacy negative
+votes and `vote_score` remain intact for compatibility; they are not displayed as
+thumbs-up counts. A legacy downvote can be replaced by giving a thumbs up.

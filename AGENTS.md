@@ -79,6 +79,9 @@ unless the task authorizes it. Preserve unrelated user changes.
   cookies, tokens or full URLs. No automatic telemetry upload or persistent storage.
 - Track deletion removes an authorized crew listing/votes, not shared music files.
   Use server-derived `can_remove` plus endpoint authorization and explicit confirmation.
+- Library reactions use one per-user thumbs-up toggle, not downvote/clear buttons.
+  Display `upvote_count` (positive votes), never reinterpret legacy net `vote_score`
+  as a like count. Keep compact icon actions at least 44px and test two-user state.
 
 - React/TypeScript, feature-oriented modules, reusable accessible primitives,
   generated API types, and consistent server-state handling.
