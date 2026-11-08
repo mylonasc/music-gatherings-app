@@ -5,19 +5,20 @@ import type { JobOut } from "../../lib/api-types";
 import { useJob } from "../../lib/use-job";
 import { ErrorNotice } from "../../components/ui";
 import type { SearchHit } from "./types";
+import { createIdempotencyKey } from "../../lib/idempotency";
 
 export function ImportControl({ hit, crewId }: { hit: SearchHit; crewId: string }) {
   const [jobId, setJobId] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const lock = useRef(false);
-  const idempotencyKey = useRef(crypto.randomUUID());
+  const [idempotencyKey] = useState(createIdempotencyKey);
   const { job, error } = useJob(jobId);
   async function start() {
     if (lock.current) return;
     lock.current = true; setStarting(true); setStartError(null);
     try {
-      const response = await post<JobOut>("/api/v1/imports", { provider: hit.provider, external_id: hit.external_id, crew_id: crewId, idempotency_key: idempotencyKey.current });
+      const response = await post<JobOut>("/api/v1/imports", { provider: hit.provider, external_id: hit.external_id, crew_id: crewId, idempotency_key: idempotencyKey });
       setJobId(response.id);
     } catch (err) { setStartError(err instanceof Error ? err.message : "Import failed to start."); }
     finally { lock.current = false; setStarting(false); }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import "./shell.css";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 
 const destinations = [
   { to: "/", label: "Jam tracks", symbol: "♫", end: true },
@@ -40,6 +41,6 @@ export function AppShell() {
       </div>}
       <p className="sidebar-note">A little less searching.<br />A little more playing.</p>
     </header>
-    <main id="main" className="app-main" tabIndex={-1} ref={main}><Outlet /></main>
+    <main id="main" className="app-main" tabIndex={-1} ref={main}><ErrorBoundary key={pathname}><Outlet /></ErrorBoundary></main>
   </div>;
 }
