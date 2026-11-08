@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { del } from "../../lib/api-client";
 import { ErrorNotice } from "../../components/ui";
+import { BinIcon } from "../../components/icons";
 
 /** Delete the authorized crew listing, never silently purge shared music. */
 export function DeleteTrackControl({ crewId, crewTrackId, title, onDeleted }: {
@@ -28,7 +29,7 @@ export function DeleteTrackControl({ crewId, crewTrackId, title, onDeleted }: {
     finally { lock.current = false; setPending(false); }
   }
   return <div className="track-delete">
-    <button ref={trigger} type="button" className="danger-action" disabled={pending || confirming} onClick={() => { setConfirming(true); setError(null); }}>Delete track</button>
+    <button ref={trigger} type="button" className="danger-action delete-trigger" aria-label={`Delete track: ${title}`} title={`Delete ${title} from this crew`} disabled={pending || confirming} onClick={() => { setConfirming(true); setError(null); }}><BinIcon /></button>
     {confirming && <div className="delete-confirmation" role="group" aria-label={`Delete ${title} from this crew`} aria-busy={pending}>
       <p><strong>Delete “{title}” from this crew?</strong></p>
       <p>This removes the crew’s listing and its votes. It does not permanently erase music files or remove the track from other crews.</p>

@@ -2,14 +2,23 @@
 .library-intro h3 { margin: 0; }
 .library-intro p { color: var(--muted); max-width: 38rem; }
 .library-intro .badge { background: var(--gold-soft); color: var(--gold); }
-.track-card-heading { display: flex; align-items: center; gap: .9rem; }
-.track-card-heading > div { min-width: 0; }
-.track-card-heading a { text-decoration: none; font-size: 1.05rem; }
 .song-mark { flex-shrink: 0; display: grid; place-items: center; width: 2.8rem; height: 3.3rem; border-radius: .6rem; background: var(--gold-soft); color: var(--gold); font-size: 1.5rem; }
 .material-badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-block: 1rem; }
-.votes { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: .9rem; }
-.votes > span:first-child { margin-right: auto; font-size: .85rem; font-weight: 650; }
-.votes button { padding: .4rem .65rem; min-width: 44px; }
+.track-list.library-grid { gap: .5rem; }
+.track-card.library-card { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: start; gap: .25rem .35rem; padding: .75rem; border-radius: .75rem; box-shadow: none; }
+.library-summary { min-width: 0; }
+.library-track-title { display: block; color: var(--ink); text-decoration: none; font-size: 1rem; line-height: 1.35; }
+.library-meta { display: flex; flex-wrap: wrap; column-gap: .4rem; color: var(--muted); font-size: .75rem; line-height: 1.5; margin-top: .2rem; }
+.library-meta > span + span::before { content: "·"; margin-right: .4rem; }
+.library-card .material-badges { gap: .25rem; margin-block: .3rem 0; }
+.library-card .badge { font-size: .68rem; line-height: 1.5; padding: .05rem .4rem; }
+.upvote-control { display: flex; flex-direction: column; max-width: 5.5rem; }
+button.upvote-toggle { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; min-width: 44px; min-height: 44px; padding: .5rem .6rem; border-color: var(--line); font-size: .85rem; }
+button.upvote-toggle[aria-pressed="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+.upvote-control .field-error { font-size: .75rem; overflow-wrap: anywhere; }
+.library-card > .track-delete { display: contents; }
+.library-card .delete-trigger { grid-column: 3; grid-row: 1; }
+.library-card .delete-confirmation { grid-column: 1 / -1; grid-row: 2; max-width: none; }
 .track-artist { color: var(--muted); font-size: 1.1rem; }
 .crew-entries { display: flex; gap: 1rem; flex-wrap: wrap; margin-block: 1rem; }
 .crew-entries section { padding: .75rem 1rem; border-left: 3px solid var(--line); }
@@ -30,6 +39,8 @@
 .track-delete { margin-top: .8rem; }
 .track-delete button.danger-action { color: var(--danger); border-color: var(--danger); background: var(--surface); }
 .track-delete button.danger-action:hover:not(:disabled) { background: var(--danger-soft); }
+.track-delete button.delete-trigger { display: inline-flex; align-items: center; justify-content: center; width: 44px; min-height: 44px; padding: .5rem; border-color: transparent; color: var(--muted); background: transparent; }
+.track-delete button.delete-trigger:hover:not(:disabled) { color: var(--danger); }
 .delete-confirmation { display: block; padding: 1rem; margin-top: .75rem; background: var(--danger-soft); border: 1px solid var(--danger); border-radius: .75rem; max-width: 36rem; }
 @media (max-width: 47.99rem) {
   .library-intro h3 { font-size: 1.05rem; }
