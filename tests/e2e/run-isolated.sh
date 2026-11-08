@@ -20,6 +20,6 @@ npm ci --prefix tests/e2e
 docker compose -p "$project" up -d --build --wait
 docker compose -p "$project" exec -T -e MUSIC_GATHERINGS_BOOTSTRAP_PASSWORD="$SEED_ADMIN_PASSWORD" backend python -m app.cli create-admin --username root
 npm run seed --prefix tests/e2e
-docker run --rm --network host --ipc=host --user "$(id -u):$(id -g)" \
+docker run --rm --network host --add-host=lan-http.test:127.0.0.1 --ipc=host --user "$(id -u):$(id -g)" \
   -e E2E_BASE_URL -e CI="${CI:-}" -v "$PWD/tests/e2e:/work" -w /work "$image" \
   npx playwright test "$@"

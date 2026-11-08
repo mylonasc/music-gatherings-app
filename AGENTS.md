@@ -57,8 +57,8 @@ unless the task authorizes it. Preserve unrelated user changes.
 
 ## Frontend and testing
 
-- UI replacement is tracked in `EPIC_UI_IMRPOVEMENTS.md` (parent #27, UI-01–UI-12).
-  Work on `implementation/ui-improvements`; reference owning issues in commits.
+- UI replacement is tracked in `EPIC_UI_IMRPOVEMENTS.md` (parent #27, UI-01–UI-12),
+  merged via PR #41. Use scoped follow-up branches; reference owning issues in commits.
   Shared visual tokens live in `frontend/src/styles/tokens.css`; use semantic
   primitives through `components/ui` and avoid broad descendant section styling.
 - UI boundaries and extension recipes: `frontend/README.md`. Track viewers are
@@ -71,6 +71,17 @@ unless the task authorizes it. Preserve unrelated user changes.
   Six desktop/Pixel/iPhone projects use digest-pinned Playwright containers;
   successful screenshots are in `tests/e2e/review-gallery/index.html`. Baseline
   updates are explicit review operations, never automatic CI fixes. See E2E README.
+- Phone LAN HTTP origins are not secure contexts: do not require `randomUUID`,
+  clipboard, or similar HTTPS-only APIs during rendering. Test genuine non-localhost
+  HTTP as well as missing capabilities. Production still requires HTTPS.
+- UI diagnostics are a bounded in-memory, user-downloadable report (`/diagnostics`).
+  Never record search terms, lyrics, raw errors/stacks, resource IDs, request bodies,
+  cookies, tokens or full URLs. No automatic telemetry upload or persistent storage.
+- Track deletion removes an authorized crew listing/votes, not shared music files.
+  Use server-derived `can_remove` plus endpoint authorization and explicit confirmation.
+- Library reactions use one per-user thumbs-up toggle, not downvote/clear buttons.
+  Display `upvote_count` (positive votes), never reinterpret legacy net `vote_score`
+  as a like count. Keep compact icon actions at least 44px and test two-user state.
 
 - React/TypeScript, feature-oriented modules, reusable accessible primitives,
   generated API types, and consistent server-state handling.

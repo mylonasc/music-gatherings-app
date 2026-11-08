@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Badge, EmptyState, ErrorNotice, Field, Loading, Page } from "../../components/ui";
 import { useGet } from "../../lib/use-api";
 import type { MemberOut } from "../../lib/api-types";
@@ -20,6 +21,7 @@ export function CrewPage() {
 
   return (
     <Page title="Jam crew">
+      <p><Link to="/diagnostics">Troubleshooting and diagnostics</Link></p>
       <p>Good music starts with good company. Meet the people sharing your next session.</p>
       {crewsLoading && <Loading label="Loading crews…" />}
       {crewsError && <ErrorNotice message={crewsError} />}

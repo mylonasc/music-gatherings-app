@@ -23,6 +23,7 @@ from app.api.v1.visibility import (
     crew_or_404,
     my_vote,
     track_genre_names,
+    upvote_count,
     user_crew_ids,
     version_artifact_kinds,
     version_count,
@@ -113,6 +114,8 @@ def _list_item(
         my_vote=my_vote(db, entry.id, user.id),
         version_count=version_count(db, track.id),
         artifact_kinds=version_artifact_kinds(db, track.id),
+        can_remove=user.is_admin or entry.added_by_id == user.id,
+        upvote_count=upvote_count(db, entry.id),
     )
 
 
@@ -351,6 +354,8 @@ def _entry_out(db: Session, entry: CrewTrack, crew_name: str, user: User) -> Cre
         crew_track_id=entry.id,
         crew_id=entry.crew_id,
         crew_name=crew_name,
+        upvote_count=upvote_count(db, entry.id),
+        can_remove=user.is_admin or entry.added_by_id == user.id,
         requester=_requester_name(db, entry.added_by_id),
         notes=entry.notes,
         piano_suitability=entry.piano_suitability,

@@ -27,10 +27,12 @@ test("voting updates the score", async ({ page }) => {
   await page.getByLabel("Title (optional)").fill(title);
   await page.getByRole("button", { name: "Suggest", exact: true }).click();
   const card = page.locator(".track-card", { hasText: title });
-  await expect(card.getByText("Votes 0")).toBeVisible();
-  await card.getByRole("button", { name: "+1" }).click();
-  await expect(card.getByText("Votes 1")).toBeVisible();
-  await expect(card.getByRole("button", { name: "Clear" })).toBeVisible();
+  await expect(card.getByRole("status")).toHaveText("0 thumbs up");
+  await card.getByRole("button", { name: "Give thumbs up" }).click();
+  await expect(card.getByRole("status")).toHaveText("1 thumbs up");
+  await card.getByRole("button", { name: "Remove thumbs up" }).click();
+  await expect(card.getByRole("status")).toHaveText("0 thumbs up");
+  await expect(card.getByRole("button", { name: "Give thumbs up" })).toHaveAttribute("aria-pressed", "false");
 });
 
 test("genre filter narrows the list", async ({ page }) => {

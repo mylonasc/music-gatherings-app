@@ -15,6 +15,21 @@ Playwright reports on successful runs too, linked from PR checks (14-day
 retention). See [`tests/e2e/README.md`](tests/e2e/README.md). Emulation does not
 certify physical-device or virtual-keyboard behavior.
 
+If a mobile view fails, open **Crew → Troubleshooting and diagnostics** (or
+`/diagnostics`), enable request timings, reproduce, and download the local report
+before reloading. Crash recovery screens also offer a report. Nothing is uploaded
+automatically; reports omit search text, lyrics, credentials and resource IDs.
+See `frontend/README.md` for the data/privacy contract. LAN HTTP is supported for
+local development, but production must still use HTTPS.
+
+Track cards/details expose **Delete track** for the adding user and admins. The
+confirmation removes the crew listing and votes; shared music files and other
+crews' listings remain intact.
+
+Track cards use a compact summary with a single thumbs-up toggle/count and a small
+bin icon. Tap thumbs up again to remove your own reaction; counts reflect positive
+reactions only. Both icon actions retain touch-friendly targets and accessible names.
+
 S01 foundation: FastAPI backend skeleton + mobile-first React frontend skeleton,
 private Compose network, and named `app-data` volume. See `EPIC_APP_BOOTSTRAP.md`
 for the full plan (slices S01–S16) and `AGENTS.md` for contributor rules.

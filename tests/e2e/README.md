@@ -34,6 +34,20 @@ isolated E2E stack raises login admission to 100 for the larger matrix; normal
 settings and provider outbound limits are unchanged. Fake provider fixtures are
 original content; ordinary tests never search/fetch live upstreams.
 
+The pinned container also maps `lan-http.test` to `127.0.0.1`. Unlike a localhost
+or loopback **URL**, this HTTP hostname is a real insecure browser origin. The
+`mobile-recovery.spec.ts` suite logs in there and asserts `isSecureContext=false`
+and missing `crypto.randomUUID`, then searches/imports fixtures. This reproduces
+the capability difference of a phone opening the app by LAN IP without touching
+your live session. Other checks cover crash recovery with navigation retained,
+local diagnostic downloads, and confirmation/cancellation/deletion of owned tracks.
+Native runs outside the script need that hostname mapping too; prefer the script.
+
+`compact-tracks.spec.ts` checks a compact card height at 320px, 44px icon targets,
+and independent thumbs-up toggles for two real approved users (including reloads
+and removal of only one's own reaction). Successful compact-list screenshots are
+attached to the review gallery. Existing visual baselines are not auto-updated.
+
 ## Inspecting screenshots
 
 - `review-gallery/index.html`: standalone gallery, including **successful**

@@ -20,6 +20,7 @@ export function TracksPage() {
   const [pianoOnly, setPianoOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchNonce, setSearchNonce] = useState(0);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const listParams = new URLSearchParams({ limit: "50" });
   if (genreFilter.trim()) listParams.set("genre", genreFilter.trim());
@@ -43,6 +44,7 @@ export function TracksPage() {
 
   return (
     <Page title="Jam tracks">
+      {notice && <p className="feedback" role="status">{notice}</p>}
       <div className="library-intro"><div><h3>The soundtrack to your next gathering.</h3>
       <p>Find a favourite, cast your vote, or bring something new to the crew.</p></div>
       {user && <span className="badge">{crews?.[0]?.name ?? user.username}</span>}</div>
@@ -100,7 +102,7 @@ export function TracksPage() {
       )}
       {tracks && crewId && !searchQuery.trim() && tracks.items.length > 0 && (
         <ul className="track-list library-grid">
-          {tracks.items.map((item) => <TrackCard key={`${crewId}:${listParams}:${item.crew_track_id}`} item={item} crewId={crewId} />)}
+          {tracks.items.map((item) => <TrackCard key={`${crewId}:${listParams}:${item.crew_track_id}`} item={item} crewId={crewId} onDeleted={() => { setNotice("Track deleted from this crew."); reload(); document.getElementById("page-title")?.focus(); }} />)}
         </ul>
       )}
     </Page>

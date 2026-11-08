@@ -27,6 +27,7 @@ function tracksFixture() {
         requester: "mia",
         piano_suitability: "suggested",
         vote_score: 3,
+        upvote_count: 3,
         my_vote: 1,
         version_count: 1,
         artifact_kinds: ["lyrics", "chord_chart"],
@@ -83,10 +84,10 @@ describe("jam tracks page", () => {
     });
     expect(await screen.findByText("Blue Test Train — The Determinists")).toBeInTheDocument();
     expect(screen.getByText("Untitled track")).toBeInTheDocument();
-    expect(screen.getByText("Votes 3")).toBeInTheDocument();
-    const plusOnes = screen.getAllByRole("button", { name: "+1" });
-    expect(plusOnes[0]).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("3 thumbs up")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove thumbs up" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/piano-friendly/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Delete track:/ })).not.toBeInTheDocument();
   });
 
   it("shows an empty state when the crew has no tracks", async () => {

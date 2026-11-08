@@ -111,6 +111,8 @@ class CrewTrackListItem(BaseModel):
     my_vote: int | None
     version_count: int
     artifact_kinds: list[str]
+    can_remove: bool = False
+    upvote_count: int = 0
 
 
 class CrewTrackList(BaseModel):
@@ -129,6 +131,8 @@ class CrewTrackEntryOut(BaseModel):
     piano_suitability: str
     vote_score: int
     my_vote: int | None
+    can_remove: bool = False
+    upvote_count: int = 0
 
 
 class CrewTrackPatch(BaseModel):

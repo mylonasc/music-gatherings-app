@@ -2,6 +2,7 @@ import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { AddTrackPage } from "../features/adding/AddTrackPage";
 import { AuthLayout } from "../features/auth/AuthLayout";
+import { DiagnosticsPanel } from "../components/DiagnosticsPanel";
 import { useAuth } from "../features/auth/AuthContext";
 import { LoginPage, RequestAccessPage } from "../features/auth/AuthPages";
 import { AdminPage } from "../features/admin/AdminPage";
@@ -34,6 +35,7 @@ export function AppRoutes() {
           <Route path="tracks/:trackId" element={<TrackDetailPage />} />
           <Route path="search" element={<OnlineSearchPage />} />
           <Route path="add" element={<AddTrackPage />} />
+          <Route path="diagnostics" element={<DiagnosticsPanel />} />
           <Route path="crew" element={<CrewPage />} />
           <Route path="admin" element={<AdminPage />} />
         </Route>

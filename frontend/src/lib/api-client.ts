@@ -6,6 +6,8 @@
  * clears the in-memory token so stale sessions fail closed.
  */
 
+import { diagnosticFetch } from "./diagnostics";
+
 export class ApiError extends Error {
   status: number;
 
@@ -49,7 +51,7 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
   if (csrfToken && method !== "GET" && method !== "HEAD") {
     headers["X-CSRF-Token"] = csrfToken;
   }
-  const response = await fetch(path, {
+  const response = await diagnosticFetch(path, {
     method,
     headers,
     body: payload,
@@ -79,7 +81,7 @@ export const get = <T>(path: string, signal?: AbortSignal): Promise<T> =>
   api<T>(path, { signal });
 
 export async function getText(path: string, signal?: AbortSignal): Promise<string> {
-  const response = await fetch(path, { credentials: "include", signal });
+  const response = await diagnosticFetch(path, { credentials: "include", signal });
   if (response.status === 401) {
     setCsrfToken(null);
   }

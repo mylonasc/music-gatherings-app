@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, ErrorNotice, Loading, Page } from "../../components/ui";
 import { useGet } from "../../lib/use-api";
 import type { TrackDetail } from "../../lib/api-types";
@@ -6,9 +6,11 @@ import { MaterialForm } from "../adding/MaterialForm";
 import { Representations } from "./Representations";
 import { TrackVersions } from "./TrackVersions";
 import "./tracks.css";
+import { DeleteTrackControl } from "./DeleteTrackControl";
 
 export function TrackDetailPage() {
   const { trackId } = useParams<{ trackId: string }>();
+  const navigate = useNavigate();
   const { data, error, loading, reload } = useGet<TrackDetail>(trackId ? `/api/v1/tracks/${trackId}` : null);
   if (loading) return <Loading label="Loading track…" />;
   if (error || !data) return <Page title="Track"><ErrorNotice message={error ?? "Track not found."} onRetry={reload} /><p><Link to="/">Back to jam tracks</Link></p></Page>;
@@ -21,6 +23,7 @@ export function TrackDetailPage() {
     <div className="crew-entries">{data.crew_entries.map((entry) => <section key={entry.crew_track_id} aria-label={`${entry.crew_name} entry`}>
       <h3>{entry.crew_name} · votes {entry.vote_score}</h3>
       {entry.requester && <p>Suggested by {entry.requester}</p>}{entry.notes && <p>{entry.notes}</p>}
+      {entry.can_remove && <DeleteTrackControl crewId={entry.crew_id} crewTrackId={entry.crew_track_id} title={title} onDeleted={() => { if (data.crew_entries.length === 1) navigate("/"); else reload(); }} />}
     </section>)}</div>
     {trackId && <Representations key={trackId} trackId={trackId} versions={data.versions} />}
     <h3>Versions and materials</h3>
